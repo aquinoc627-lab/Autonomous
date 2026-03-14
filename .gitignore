@@ -1,0 +1,11 @@
+venv/
+*.pyc
+__pycache__/
+node_modules/
+swarm-frontend/node_modules/
+build/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+*.zip
