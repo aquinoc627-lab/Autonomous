@@ -1,11 +1,38 @@
-venv/
-*.pyc
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+.venv/
+venv/
+env/
+
+# Backend data
+backend/data/
+
+# Node
 node_modules/
 swarm-frontend/node_modules/
+swarm-frontend/build/
+swarm-frontend/.env.local
 build/
-dist/
-*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# Archives
 *.zip
+
+# Env
+.env.production

@@ -1,0 +1,83 @@
+erDiagram
+    users {
+        string id PK "UUID"
+        string username UK "unique, 3-64 chars"
+        string email UK "unique, max 320"
+        string hashed_password "bcrypt hash"
+        string role "admin | operator"
+        boolean is_active "default true"
+        datetime created_at
+        datetime updated_at
+    }
+
+    agents {
+        string id PK "UUID"
+        string name UK "unique, max 128"
+        string status "idle | active | offline | error"
+        text description "optional"
+        string created_by FK "users.id, SET NULL"
+        datetime created_at
+        datetime updated_at
+    }
+
+    missions {
+        string id PK "UUID"
+        string name "max 256"
+        text description "optional"
+        string status "pending | in_progress | completed | failed | cancelled"
+        string priority "low | medium | high | critical"
+        string created_by FK "users.id, SET NULL"
+        datetime started_at "nullable"
+        datetime completed_at "nullable"
+        datetime created_at
+        datetime updated_at
+    }
+
+    agent_missions {
+        int id PK "auto-increment"
+        string agent_id FK "agents.id, CASCADE"
+        string mission_id FK "missions.id, CASCADE"
+        string assigned_by FK "users.id, SET NULL"
+        datetime assigned_at
+    }
+
+    banter {
+        string id PK "UUID"
+        text message "1-4096 chars"
+        string message_type "chat | system | alert | status_update"
+        string sender_id FK "users.id, SET NULL"
+        string mission_id FK "missions.id, SET NULL"
+        string agent_id FK "agents.id, SET NULL"
+        datetime created_at
+    }
+
+    refresh_tokens {
+        int id PK "auto-increment"
+        string user_id FK "users.id, CASCADE"
+        string token_hash UK "SHA-256 hash"
+        datetime expires_at
+        boolean revoked "default false"
+        datetime created_at
+    }
+
+    audit_log {
+        int id PK "auto-increment"
+        string user_id FK "users.id, SET NULL"
+        string action "max 64"
+        string entity_type "max 32"
+        string entity_id "nullable, max 36"
+        json details "nullable"
+        string ip_address "nullable, max 45"
+        datetime created_at
+    }
+
+    users ||--o{ agents : "creates"
+    users ||--o{ missions : "creates"
+    users ||--o{ banter : "sends"
+    users ||--o{ refresh_tokens : "owns"
+    users ||--o{ audit_log : "performs"
+    users ||--o{ agent_missions : "assigns"
+    agents ||--o{ agent_missions : "participates"
+    missions ||--o{ agent_missions : "includes"
+    agents ||--o{ banter : "referenced in"
+    missions ||--o{ banter : "referenced in"
