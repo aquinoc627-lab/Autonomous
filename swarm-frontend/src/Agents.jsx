@@ -3,8 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { agentsAPI } from "./api";
 import { useAuth } from "./AuthContext";
 import { useWebSocket } from "./useWebSocket";
+import { useToast } from "./ToastContext";
 import AgentAvatar from "./AgentAvatar";
-import { MdAdd, MdEdit, MdDelete } from "react-icons/md";
+import { MdAdd, MdEdit, MdDelete, MdPsychology } from "react-icons/md";
+import axios from "axios";
 
 const STATUSES = ["idle", "active", "offline", "error"];
 const ICONS = ["shield", "crosshair", "eye", "brain", "bolt", "satellite"];
@@ -13,11 +15,13 @@ const COLORS = ["#00f0ff", "#39ff14", "#ff006e", "#bf00ff", "#ff6b00", "#ffe600"
 
 export default function Agents() {
   const { isAdmin } = useAuth();
+  const { addToast } = useToast();
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [editAgent, setEditAgent] = useState(null);
   const [detailAgent, setDetailAgent] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
+  const [triggering, setTriggering] = useState({});
 
   const onWsMessage = useCallback(
     (msg) => {
@@ -56,12 +60,42 @@ export default function Agents() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agents"] }),
   });
 
+  const handleTriggerBrain = async (e, agent) => {
+    e.stopPropagation();
+    if (agent.status !== "active") {
+      addToast({ type: "warning", title: "Agent Offline", message: "Agent must be 'active' to use the Brain." });
+      return;
+    }
+
+    setTriggering(prev => ({ ...prev, [agent.id]: true }));
+    try {
+      const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
+      const token = localStorage.getItem("access_token");
+      
+      // We'll add a specific trigger endpoint to the backend agents router
+      await axios.post(`${API_BASE}/api/agents/${agent.id}/think`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      addToast({ 
+        type: "success", 
+        title: "Brain Triggered", 
+        message: `${agent.name} is now reasoning...` 
+      });
+    } catch (err) {
+      console.error("Failed to trigger brain", err);
+      addToast({ type: "error", title: "Error", message: "Failed to trigger agent brain." });
+    } finally {
+      setTriggering(prev => ({ ...prev, [agent.id]: false }));
+    }
+  };
+
   return (
     <div>
       <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <h2>Agent Control</h2>
-          <p>Manage swarm agents, personas, and their assignments</p>
+          <p>Manage swarm agents, personas, and their autonomous brains</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowCreate(true)}>
           <MdAdd /> New Agent
@@ -97,18 +131,30 @@ export default function Agents() {
             <p style={{ color: "var(--text-muted)", fontSize: 11, marginBottom: 12 }}>
               Voice: {agent.persona?.voice_style || "neutral"}
             </p>
-            <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
-              <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); setEditAgent(agent); }}>
-                <MdEdit /> Edit
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <button 
+                className={`btn btn-block ${triggering[agent.id] ? "btn-secondary" : "btn-primary"} btn-sm`}
+                onClick={(e) => handleTriggerBrain(e, agent)}
+                disabled={triggering[agent.id] || agent.status !== "active"}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+              >
+                <MdPsychology size={16} /> {triggering[agent.id] ? "Thinking..." : "Trigger Brain"}
               </button>
-              {isAdmin && (
-                <button className="btn btn-danger btn-sm" onClick={(e) => {
-                  e.stopPropagation();
-                  if (window.confirm(`Delete agent "${agent.name}"?`)) deleteMut.mutate(agent.id);
-                }}>
-                  <MdDelete /> Delete
+              
+              <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                <button className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={(e) => { e.stopPropagation(); setEditAgent(agent); }}>
+                  <MdEdit /> Edit
                 </button>
-              )}
+                {isAdmin && (
+                  <button className="btn btn-danger btn-sm" style={{ flex: 1 }} onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(`Delete agent "${agent.name}"?`)) deleteMut.mutate(agent.id);
+                  }}>
+                    <MdDelete /> Delete
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}

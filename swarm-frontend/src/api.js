@@ -103,6 +103,14 @@ export const analyticsAPI = {
   overview: () => api.get("/api/analytics/overview"),
   activity: () => api.get("/api/analytics/activity"),
   health: () => api.get("/api/analytics/health"),
+  presence: () => api.get("/api/analytics/presence"),
+  audit: (params) => api.get("/api/analytics/audit", { params }),
+};
+
+// ── Autonomous Mode ───────────────────────────────────────────────
+export const autonomousAPI = {
+  getStatus: () => api.get("/api/autonomous"),
+  toggle: (enabled) => api.post(`/api/autonomous?enabled=${enabled}`),
 };
 
 export default api;

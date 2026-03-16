@@ -8,6 +8,7 @@ Endpoints:
   PATCH  /api/agents/{id}     — update an agent
   DELETE /api/agents/{id}     — delete an agent (admin only)
   GET    /api/agents/{id}/missions — list missions assigned to an agent
+  POST   /api/agents/{id}/think    — trigger agent brain manually
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ from app.core.audit import record_audit
 from app.core.database import get_db
 from app.core.security import get_current_user, require_admin
 from app.core.websocket_manager import manager
+from app.core.brain import AgentBrain
 from app.models.agent import Agent
 from app.models.agent_mission import AgentMission
 from app.models.mission import Mission
@@ -73,6 +75,7 @@ async def create_agent(
         name=body.name,
         description=body.description,
         status=body.status.value,
+        persona=body.persona,
         created_by=current_user.id,
     )
     db.add(agent)
@@ -128,7 +131,7 @@ async def update_agent(
         raise HTTPException(status_code=404, detail="Agent not found")
 
     # Capture before-state for audit
-    before = {"name": agent.name, "status": agent.status, "description": agent.description}
+    before = {"name": agent.name, "status": agent.status, "description": agent.description, "persona": agent.persona}
 
     update_data = body.model_dump(exclude_unset=True)
     if "status" in update_data and update_data["status"] is not None:
@@ -141,7 +144,7 @@ async def update_agent(
     await db.refresh(agent)
 
     # Audit log
-    after = {"name": agent.name, "status": agent.status, "description": agent.description}
+    after = {"name": agent.name, "status": agent.status, "description": agent.description, "persona": agent.persona}
     await record_audit(
         db,
         user_id=current_user.id,
@@ -208,3 +211,17 @@ async def get_agent_missions(
         .order_by(Mission.created_at.desc())
     )
     return result.scalars().all()
+
+
+@router.post("/{agent_id}/think")
+async def trigger_agent_think(
+    agent_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(get_current_user),
+):
+    """Manually trigger an agent's brain to reason and act."""
+    action = await AgentBrain.think(db, agent_id)
+    if action:
+        await AgentBrain.execute_action(db, agent_id, action)
+        return {"status": "success", "action": action}
+    return {"status": "no_action"}

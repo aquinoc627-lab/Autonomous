@@ -4,18 +4,28 @@
  * A slide-out panel accessible from the top bar that shows:
  *   - Recent notifications (from WebSocket events)
  *   - Online users (presence)
+ *   - Autonomous Mode toggle
  */
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useWebSocket } from "./useWebSocket";
 import { useToast } from "./ToastContext";
+import { autonomousAPI } from "./api";
 
 export default function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unread, setUnread] = useState(0);
+  const [autonomousEnabled, setAutonomousEnabled] = useState(false);
   const { addToast } = useToast();
+
+  // Fetch initial autonomous status
+  useEffect(() => {
+    autonomousAPI.getStatus()
+      .then(res => setAutonomousEnabled(res.data.enabled))
+      .catch(err => console.error("Failed to fetch autonomous status", err));
+  }, []);
 
   const handleWsMessage = useCallback(
     (data) => {
@@ -86,11 +96,6 @@ export default function NotificationCenter() {
 
   const { connected } = useWebSocket(handleWsMessage);
 
-  // Request presence on mount
-  useEffect(() => {
-    // Presence will be populated via WebSocket events
-  }, []);
-
   const toggleOpen = () => {
     setOpen((prev) => !prev);
     if (!open) setUnread(0);
@@ -99,6 +104,27 @@ export default function NotificationCenter() {
   const clearAll = () => {
     setNotifications([]);
     setUnread(0);
+  };
+
+  const handleToggleAutonomous = async () => {
+    const newState = !autonomousEnabled;
+    try {
+      await autonomousAPI.toggle(newState);
+      setAutonomousEnabled(newState);
+      addToast({
+        type: newState ? "success" : "warning",
+        title: "Autonomous Mode",
+        message: `Agent Brain is now ${newState ? "ONLINE" : "OFFLINE"}`,
+        duration: 3000,
+      });
+    } catch (err) {
+      addToast({
+        type: "error",
+        title: "Error",
+        message: "Failed to toggle autonomous mode",
+        duration: 3000,
+      });
+    }
   };
 
   return (
@@ -113,6 +139,10 @@ export default function NotificationCenter() {
           <div className="presence-indicator">
             <span className="presence-dot" />
             {onlineUsers.length} online
+          </div>
+          <div className={`autonomous-status ${autonomousEnabled ? "active" : ""}`}>
+            <span className="autonomous-dot" />
+            Brain: {autonomousEnabled ? "ONLINE" : "OFFLINE"}
           </div>
         </div>
         <div className="topbar-right">
@@ -131,13 +161,29 @@ export default function NotificationCenter() {
         <div className="notification-overlay" onClick={toggleOpen}>
           <div className="notification-panel" onClick={(e) => e.stopPropagation()}>
             <div className="notification-panel-header">
-              <h3>Notifications</h3>
+              <h3>System Control</h3>
               <div style={{ display: "flex", gap: 8 }}>
                 <button className="btn btn-sm btn-secondary" onClick={clearAll}>
                   Clear All
                 </button>
                 <button className="btn btn-sm btn-secondary" onClick={toggleOpen}>
                   &times;
+                </button>
+              </div>
+            </div>
+
+            {/* Autonomous Mode Toggle */}
+            <div className="notification-section">
+              <h4>Autonomous Mode</h4>
+              <div className="autonomous-control">
+                <div className="control-info">
+                  <p>When enabled, agents will autonomously reason about missions and communicate in the Banter feed.</p>
+                </div>
+                <button 
+                  className={`btn btn-block ${autonomousEnabled ? "btn-danger" : "btn-primary"}`}
+                  onClick={handleToggleAutonomous}
+                >
+                  {autonomousEnabled ? "Disable Agent Brain" : "Enable Agent Brain"}
                 </button>
               </div>
             </div>

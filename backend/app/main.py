@@ -10,10 +10,11 @@ Run with:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import agents, analytics, auth, banter, missions, ws
@@ -24,6 +25,9 @@ from app.core.config import (
     CORS_ORIGINS,
 )
 from app.core.database import init_db
+from app.core.tasks import agent_brain_loop, set_autonomous_mode, get_autonomous_mode
+from app.core.security import get_current_user
+from app.models.user import User
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,7 +39,20 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Swarm Suite API v%s", APP_VERSION)
     await init_db()
     logger.info("Database tables verified.")
+    
+    # Start the Agent Brain background loop
+    brain_task = asyncio.create_task(agent_brain_loop())
+    logger.info("Agent Brain background loop started.")
+    
     yield
+    
+    # Cancel the background task on shutdown
+    brain_task.cancel()
+    try:
+        await brain_task
+    except asyncio.CancelledError:
+        logger.info("Agent Brain background loop cancelled.")
+    
     logger.info("Shutting down Swarm Suite API.")
 
 
@@ -85,3 +102,17 @@ async def root():
 async def health_check():
     """API health check endpoint."""
     return {"status": "ok"}
+
+# ---------------------------------------------------------------------------
+# Autonomous Mode Control
+# ---------------------------------------------------------------------------
+@app.get("/api/autonomous", tags=["Autonomous"])
+async def get_autonomous_status(current_user: User = Depends(get_current_user)):
+    """Get the current status of autonomous mode."""
+    return {"enabled": get_autonomous_mode()}
+
+@app.post("/api/autonomous", tags=["Autonomous"])
+async def toggle_autonomous_mode(enabled: bool, current_user: User = Depends(get_current_user)):
+    """Toggle autonomous mode on or off."""
+    set_autonomous_mode(enabled)
+    return {"enabled": get_autonomous_mode()}
