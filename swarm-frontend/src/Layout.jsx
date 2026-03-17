@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import NotificationCenter from "./NotificationCenter";
+import VoiceControl from "./VoiceControl";
 import {
   MdDashboard,
   MdRocketLaunch,
@@ -124,7 +125,10 @@ export default function Layout() {
       </aside>
 
       <main className="main-content">
-        <NotificationCenter />
+        <div style={{ position: "relative" }}>
+          <VoiceControl />
+          <NotificationCenter />
+        </div>
         <Outlet />
       </main>
     </div>

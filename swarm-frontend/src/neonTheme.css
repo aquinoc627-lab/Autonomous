@@ -1526,3 +1526,178 @@ body {
     padding: 6px;
   }
 }
+
+
+/* ================================================================
+   Voice Control Widget
+   ================================================================ */
+
+.voice-control-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.voice-control-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  border: 2px solid var(--neon-cyan);
+  color: var(--bg-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.voice-control-btn:hover {
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.voice-control-btn.listening {
+  animation: pulse-listening 1s infinite;
+  background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+  border-color: var(--neon-green);
+}
+
+.voice-control-btn.speaking {
+  animation: pulse-speaking 0.6s infinite;
+  background: linear-gradient(135deg, var(--neon-orange), var(--neon-pink));
+  border-color: var(--neon-orange);
+}
+
+@keyframes pulse-listening {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(57, 255, 20, 0.6);
+  }
+}
+
+@keyframes pulse-speaking {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 107, 0, 0.6);
+  }
+}
+
+.voice-control-status {
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-green);
+  color: var(--neon-green);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-neon);
+}
+
+.voice-control-status.speaking {
+  border-color: var(--neon-orange);
+  color: var(--neon-orange);
+}
+
+.listening-dot,
+.speaking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-dot 1s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.voice-control-transcript {
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  max-width: 200px;
+  word-break: break-word;
+  box-shadow: var(--shadow-neon);
+}
+
+/* ================================================================
+   Message Speak Button
+   ================================================================ */
+
+.msg-speak-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin: 0 4px;
+}
+
+.msg-speak-btn:hover {
+  color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.msg-speak-btn.active {
+  color: var(--neon-orange);
+  background: rgba(255, 107, 0, 0.1);
+  animation: pulse-speak-btn 0.6s infinite;
+}
+
+@keyframes pulse-speak-btn {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ================================================================
+   Mobile Responsiveness for Voice Control
+   ================================================================ */
+
+@media (max-width: 480px) {
+  .voice-control-widget {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .voice-control-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .voice-control-transcript {
+    max-width: 150px;
+    font-size: 11px;
+  }
+}

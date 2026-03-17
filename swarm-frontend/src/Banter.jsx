@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { banterAPI, missionsAPI, agentsAPI } from "./api";
 import { useWebSocket } from "./useWebSocket";
+import { useVoiceEngine } from "./useVoiceEngine";
 import { AgentAvatarInline } from "./AgentAvatar";
-import { MdSend } from "react-icons/md";
+import { MdSend, MdVolumeUp } from "react-icons/md";
 
 const MSG_TYPES = ["chat", "system", "alert", "status_update"];
 
@@ -14,6 +15,8 @@ export default function Banter() {
   const [agentFilter, setAgentFilter] = useState("");
   const [message, setMessage] = useState("");
   const [msgType, setMsgType] = useState("chat");
+  const [speakingMsgId, setSpeakingMsgId] = useState(null);
+  const { speak, stopSpeaking } = useVoiceEngine();
 
   const onWsMessage = useCallback(
     (msg) => {
@@ -90,6 +93,16 @@ export default function Banter() {
 
   // Determine which messages are "recent" (within last 10 seconds) for speaking animation
   const recentCutoff = Date.now() - 10000;
+
+  const handleSpeak = (msgId, text, persona) => {
+    if (speakingMsgId === msgId) {
+      stopSpeaking();
+      setSpeakingMsgId(null);
+    } else {
+      speak(text, persona || "Analytical & Thorough");
+      setSpeakingMsgId(msgId);
+    }
+  };
 
   return (
     <div>
@@ -180,6 +193,15 @@ export default function Banter() {
                       <span className={`badge ${b.message_type}`} style={{ fontSize: 10, padding: "1px 6px" }}>
                         {b.message_type}
                       </span>
+                      {linkedAgent && (
+                        <button
+                          className={`msg-speak-btn ${speakingMsgId === b.id ? "active" : ""}`}
+                          onClick={() => handleSpeak(b.id, b.message, linkedAgent.persona?.personality)}
+                          title="Hear this message"
+                        >
+                          <MdVolumeUp size={14} />
+                        </button>
+                      )}
                       <span className="msg-time">
                         {new Date(b.created_at).toLocaleTimeString()}
                       </span>
