@@ -105,7 +105,7 @@ export default function Banter() {
       </div>
 
       {/* Filters */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexDirection: window.innerWidth <= 480 ? "column" : "row" }}>
         <div className="form-group" style={{ margin: 0, flex: 1 }}>
           <label>Filter by Mission</label>
           <select className="form-select" value={missionFilter} onChange={(e) => setMissionFilter(e.target.value)}>
@@ -127,7 +127,7 @@ export default function Banter() {
       </div>
 
       {/* Chat Panel */}
-      <div className="panel" style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 280px)", padding: 0 }}>
+      <div className="panel" style={{ display: "flex", flexDirection: "column", height: window.innerWidth <= 480 ? "calc(100vh - 320px)" : "calc(100vh - 280px)", padding: 0 }}>
         {/* Feed */}
         <div className="banter-feed" ref={feedRef}>
           {sortedMsgs.length === 0 && (

@@ -170,7 +170,7 @@ export default function SwarmView() {
           <div className="panel-header">
             <h3>Agent Profile: {selectedAgent.name}</h3>
           </div>
-          <div style={{ display: "flex", gap: 24, padding: "16px 0" }}>
+          <div style={{ display: "flex", gap: 24, padding: "16px 0", flexDirection: window.innerWidth <= 480 ? "column" : "row", alignItems: window.innerWidth <= 480 ? "center" : "flex-start" }}>
             <AgentAvatar
               agent={selectedAgent}
               size={120}

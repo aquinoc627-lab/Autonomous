@@ -131,7 +131,7 @@ export default function Analytics() {
       </div>
 
       {/* Charts Row 1 */}
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "2fr 1fr", gap: 16, marginBottom: 16 }}>
         {/* Activity Timeline */}
         <div className="panel">
           <div className="panel-header"><h3>7-Day Activity</h3></div>
@@ -175,7 +175,7 @@ export default function Analytics() {
       </div>
 
       {/* Charts Row 2 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "1fr 1fr 1fr", gap: 16 }}>
         {/* Mission Status */}
         <div className="panel">
           <div className="panel-header"><h3>Mission Status</h3></div>
