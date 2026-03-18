@@ -45,6 +45,9 @@ class Mission(Base, UUIDPrimaryKey, TimestampMixin):
     created_by: Mapped[Optional[str]] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
+    parent_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("missions.id", ondelete="CASCADE"), nullable=True
+    )
     started_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
@@ -57,6 +60,12 @@ class Mission(Base, UUIDPrimaryKey, TimestampMixin):
     # ------------------------------------------------------------------
     creator: Mapped[Optional["User"]] = relationship(
         foreign_keys=[created_by], lazy="selectin"
+    )
+    parent: Mapped[Optional["Mission"]] = relationship(
+        remote_side="Mission.id", back_populates="sub_tasks", lazy="selectin"
+    )
+    sub_tasks: Mapped[List["Mission"]] = relationship(
+        back_populates="parent", cascade="all, delete-orphan", lazy="selectin"
     )
     agent_missions: Mapped[List["AgentMission"]] = relationship(
         back_populates="mission", cascade="all, delete-orphan", lazy="selectin"
@@ -72,6 +81,7 @@ class Mission(Base, UUIDPrimaryKey, TimestampMixin):
         Index("ix_missions_status", "status"),
         Index("ix_missions_priority", "priority"),
         Index("ix_missions_created_at", "created_at"),
+        Index("ix_missions_parent_id", "parent_id"),
     )
 
     def __repr__(self) -> str:

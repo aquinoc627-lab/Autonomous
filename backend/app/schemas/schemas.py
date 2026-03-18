@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 import re
@@ -147,6 +147,7 @@ class MissionCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=4096)
     status: MissionStatus = MissionStatus.pending
     priority: MissionPriority = MissionPriority.medium
+    parent_id: Optional[str] = None
 
 
 class MissionRead(BaseModel):
@@ -158,10 +159,12 @@ class MissionRead(BaseModel):
     status: MissionStatus
     priority: MissionPriority
     created_by: Optional[str]
+    parent_id: Optional[str]
     started_at: Optional[datetime]
     completed_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+    sub_tasks: List[MissionRead] = []
 
 
 class MissionUpdate(BaseModel):
@@ -169,6 +172,7 @@ class MissionUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=4096)
     status: Optional[MissionStatus] = None
     priority: Optional[MissionPriority] = None
+    parent_id: Optional[str] = None
 
 
 # ======================================================================
@@ -257,3 +261,4 @@ class AuditLogRead(BaseModel):
     details: Optional[Any]
     ip_address: Optional[str]
     created_at: datetime
+    updated_at: datetime

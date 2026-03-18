@@ -33,6 +33,7 @@ You MUST respond in strict JSON format with the following fields:
 - "new_agent_status": A new status for yourself (optional, e.g., "active", "idle", "busy").
 - "mission_updates": A list of objects with {{"mission_id": UUID, "new_status": "pending"|"in_progress"|"completed"|"failed"}} (optional).
 - "tool_use": An object with {{"tool_name": string, "parameters": object}} (optional).
+- "swarm_action": An object with {{"action": "delegate"|"request_help"|"reply", "target_agent_id": UUID, "content": string}} (optional).
 
 Your Persona:
 Name: {name}
@@ -43,13 +44,18 @@ Icon: {icon}
 Current Context:
 Missions Assigned: {missions}
 Recent Banter Feed: {banter}
+Other Agents in Swarm: {other_agents}
 
 Guidelines:
 1. Stay in character. Use your voice style and personality in every message.
 2. Be autonomous. If a mission is "pending" and you are "active", move it to "in_progress".
 3. Use tools when you need real-world information to complete a mission.
-4. If you use a tool, explain why in your reasoning.
-5. Be concise. Banter messages should be short and impactful.
+4. SWARM INTELLIGENCE: 
+   - If a mission is too complex, use "swarm_action": "delegate" to assign a sub-task to another agent.
+   - If you need help, use "swarm_action": "request_help" to ping another agent.
+   - If another agent mentions you or asks for help in the Banter feed, use "swarm_action": "reply" to respond.
+5. If you use a tool or swarm action, explain why in your reasoning.
+6. Be concise. Banter messages should be short and impactful.
 """
 
 SYNTHESIS_PROMPT = """
@@ -83,10 +89,20 @@ class AgentBrain:
             for b in reversed(banter)
         ]
 
+        # Get other agents
+        stmt = select(Agent).where(Agent.id != agent_id)
+        result = await db.execute(stmt)
+        other_agents = result.scalars().all()
+        other_agents_list = [
+            f"{a.name} (ID: {a.id}, Status: {a.status}, Persona: {a.persona.get('personality', 'Unknown') if a.persona else 'Unknown'})"
+            for a in other_agents
+        ]
+
         return {
             "agent": agent,
             "missions": [f"{m.name} (ID: {m.id}, Status: {m.status}, Priority: {m.priority})" for m in missions],
-            "banter": banter_list
+            "banter": banter_list,
+            "other_agents": other_agents_list
         }
 
     @staticmethod
@@ -109,6 +125,7 @@ class AgentBrain:
             icon=persona.get("icon", "robot"),
             missions=", ".join(context["missions"]) if context["missions"] else "None",
             banter="\n".join(context["banter"]) if context["banter"] else "No recent activity.",
+            other_agents=", ".join(context["other_agents"]) if context["other_agents"] else "None",
             tools=json.dumps(AVAILABLE_TOOLS)
         )
 
@@ -219,7 +236,33 @@ class AgentBrain:
                         "data": {"id": str(mission.id), "status": mission.status}
                     })
 
-        # 3. Send Banter Message
+        # 3. Handle Swarm Action
+        if "swarm_action" in action:
+            swarm_action = action["swarm_action"]
+            target_agent = await db.get(Agent, swarm_action["target_agent_id"])
+            if target_agent:
+                message = f"@{target_agent.name}: {swarm_action['content']}"
+                new_banter = Banter(
+                    message=message,
+                    message_type="chat",
+                    agent_id=agent.id,
+                    sender_id=agent.name
+                )
+                db.add(new_banter)
+                await db.flush()
+                await manager.broadcast({
+                    "event": "banter_created",
+                    "data": {
+                        "id": str(new_banter.id),
+                        "message": new_banter.message,
+                        "message_type": new_banter.message_type,
+                        "agent_id": str(agent.id),
+                        "sender_id": agent.name,
+                        "created_at": new_banter.created_at.isoformat()
+                    }
+                })
+
+        # 4. Send Banter Message
         if "message" in action:
             new_banter = Banter(
                 message=action["message"],

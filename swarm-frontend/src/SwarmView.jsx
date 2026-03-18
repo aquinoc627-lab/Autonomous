@@ -3,16 +3,20 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { analyticsAPI, agentsAPI, missionsAPI, banterAPI } from "./api";
 import { useWebSocket } from "./useWebSocket";
 import AgentAvatar from "./AgentAvatar";
+import SwarmGraph from "./SwarmGraph";
 import {
   MdSmartToy,
   MdRocketLaunch,
   MdChat,
   MdPeople,
+  MdHub,
+  MdGridView,
 } from "react-icons/md";
 
 export default function SwarmView() {
   const queryClient = useQueryClient();
   const [selectedAgent, setSelectedAgent] = useState(null);
+  const [activeTab, setActiveTab] = useState("grid"); // "grid" or "collaboration"
 
   const onWsMessage = useCallback(
     (msg) => {
@@ -67,9 +71,6 @@ export default function SwarmView() {
   // Determine listening agents (active agents assigned to in-progress missions)
   const listeningAgentIds = useMemo(() => {
     if (!agents || !missions) return new Set();
-    const inProgressMissionIds = new Set(
-      missions.filter((m) => m.status === "in_progress").map((m) => m.id)
-    );
     const ids = new Set();
     for (const a of agents) {
       if (a.status === "active" && !speakingAgentIds.has(a.id)) {
@@ -126,126 +127,150 @@ export default function SwarmView() {
         </div>
       </div>
 
-      {/* Animated Agent Swarm Grid */}
-      <div className="panel" style={{ marginBottom: 24 }}>
-        <div className="panel-header">
-          <h3>Agent Swarm</h3>
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            Click an agent to inspect
-          </span>
-        </div>
-        <div className="swarm-grid">
-          {agents?.map((agent) => (
-            <div
-              key={agent.id}
-              className="swarm-agent-cell"
-              onClick={() => setSelectedAgent(selectedAgent?.id === agent.id ? null : agent)}
-            >
-              <AgentAvatar
-                agent={agent}
-                size={80}
-                speaking={speakingAgentIds.has(agent.id)}
-                listening={listeningAgentIds.has(agent.id)}
-                showLabel
-              />
-              <div className="agent-voice-tag">
-                {speakingAgentIds.has(agent.id)
-                  ? "SPEAKING"
-                  : listeningAgentIds.has(agent.id)
-                  ? "LISTENING"
-                  : agent.status === "offline"
-                  ? "OFFLINE"
-                  : agent.status === "error"
-                  ? "ERROR"
-                  : "STANDBY"}
+      {/* View Tabs */}
+      <div className="view-tabs" style={{ marginBottom: 24, display: "flex", gap: 12 }}>
+        <button 
+          className={`btn ${activeTab === "grid" ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setActiveTab("grid")}
+          style={{ display: "flex", alignItems: "center", gap: 8 }}
+        >
+          <MdGridView /> Swarm Grid
+        </button>
+        <button 
+          className={`btn ${activeTab === "collaboration" ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setActiveTab("collaboration")}
+          style={{ display: "flex", alignItems: "center", gap: 8 }}
+        >
+          <MdHub /> Collaboration Graph
+        </button>
+      </div>
+
+      {activeTab === "grid" ? (
+        <>
+          {/* Animated Agent Swarm Grid */}
+          <div className="panel" style={{ marginBottom: 24 }}>
+            <div className="panel-header">
+              <h3>Agent Swarm</h3>
+              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                Click an agent to inspect
+              </span>
+            </div>
+            <div className="swarm-grid">
+              {agents?.map((agent) => (
+                <div
+                  key={agent.id}
+                  className="swarm-agent-cell"
+                  onClick={() => setSelectedAgent(selectedAgent?.id === agent.id ? null : agent)}
+                >
+                  <AgentAvatar
+                    agent={agent}
+                    size={80}
+                    speaking={speakingAgentIds.has(agent.id)}
+                    listening={listeningAgentIds.has(agent.id)}
+                    showLabel
+                  />
+                  <div className="agent-voice-tag">
+                    {speakingAgentIds.has(agent.id)
+                      ? "SPEAKING"
+                      : listeningAgentIds.has(agent.id)
+                      ? "LISTENING"
+                      : agent.status === "offline"
+                      ? "OFFLINE"
+                      : agent.status === "error"
+                      ? "ERROR"
+                      : "STANDBY"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Selected Agent Detail */}
+          {selectedAgent && (
+            <div className="panel" style={{ marginBottom: 24 }}>
+              <div className="panel-header">
+                <h3>Agent Profile: {selectedAgent.name}</h3>
+              </div>
+              <div style={{ display: "flex", gap: 24, padding: "16px 0", flexDirection: window.innerWidth <= 480 ? "column" : "row", alignItems: window.innerWidth <= 480 ? "center" : "flex-start" }}>
+                <AgentAvatar
+                  agent={selectedAgent}
+                  size={120}
+                  speaking={speakingAgentIds.has(selectedAgent.id)}
+                  listening={listeningAgentIds.has(selectedAgent.id)}
+                />
+                <div style={{ flex: 1 }}>
+                  <table className="data-table" style={{ marginBottom: 0 }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ color: "var(--text-muted)", width: 120 }}>Status</td>
+                        <td><span className={`badge ${selectedAgent.status}`}><span className="dot" />{selectedAgent.status}</span></td>
+                      </tr>
+                      <tr>
+                        <td style={{ color: "var(--text-muted)" }}>Personality</td>
+                        <td>{selectedAgent.persona?.personality || "Unknown"}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ color: "var(--text-muted)" }}>Voice Style</td>
+                        <td style={{ textTransform: "capitalize" }}>{selectedAgent.persona?.voice_style || "neutral"}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ color: "var(--text-muted)" }}>Description</td>
+                        <td>{selectedAgent.description || "No description"}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ color: "var(--text-muted)" }}>Activity</td>
+                        <td>
+                          {speakingAgentIds.has(selectedAgent.id)
+                            ? "Currently transmitting banter"
+                            : listeningAgentIds.has(selectedAgent.id)
+                            ? "Monitoring active missions"
+                            : "Idle / Standby"}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      {/* Selected Agent Detail */}
-      {selectedAgent && (
-        <div className="panel" style={{ marginBottom: 24 }}>
-          <div className="panel-header">
-            <h3>Agent Profile: {selectedAgent.name}</h3>
-          </div>
-          <div style={{ display: "flex", gap: 24, padding: "16px 0", flexDirection: window.innerWidth <= 480 ? "column" : "row", alignItems: window.innerWidth <= 480 ? "center" : "flex-start" }}>
-            <AgentAvatar
-              agent={selectedAgent}
-              size={120}
-              speaking={speakingAgentIds.has(selectedAgent.id)}
-              listening={listeningAgentIds.has(selectedAgent.id)}
-            />
-            <div style={{ flex: 1 }}>
-              <table className="data-table" style={{ marginBottom: 0 }}>
-                <tbody>
-                  <tr>
-                    <td style={{ color: "var(--text-muted)", width: 120 }}>Status</td>
-                    <td><span className={`badge ${selectedAgent.status}`}><span className="dot" />{selectedAgent.status}</span></td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "var(--text-muted)" }}>Personality</td>
-                    <td>{selectedAgent.persona?.personality || "Unknown"}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "var(--text-muted)" }}>Voice Style</td>
-                    <td style={{ textTransform: "capitalize" }}>{selectedAgent.persona?.voice_style || "neutral"}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "var(--text-muted)" }}>Description</td>
-                    <td>{selectedAgent.description || "No description"}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ color: "var(--text-muted)" }}>Activity</td>
+          {/* Mission Status Table */}
+          <div className="panel">
+            <div className="panel-header">
+              <h3>Mission Status</h3>
+            </div>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {missions?.map((m) => (
+                  <tr key={m.id}>
+                    <td>{m.name}</td>
                     <td>
-                      {speakingAgentIds.has(selectedAgent.id)
-                        ? "Currently transmitting banter"
-                        : listeningAgentIds.has(selectedAgent.id)
-                        ? "Monitoring active missions"
-                        : "Idle / Standby"}
+                      <span className={`badge ${m.priority}`}>
+                        {m.priority}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${m.status}`}>
+                        <span className="dot" />
+                        {m.status.replace("_", " ")}
+                      </span>
                     </td>
                   </tr>
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </>
+      ) : (
+        <SwarmGraph />
       )}
-
-      {/* Mission Status Table */}
-      <div className="panel">
-        <div className="panel-header">
-          <h3>Mission Status</h3>
-        </div>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Priority</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {missions?.map((m) => (
-              <tr key={m.id}>
-                <td>{m.name}</td>
-                <td>
-                  <span className={`badge ${m.priority}`}>
-                    {m.priority}
-                  </span>
-                </td>
-                <td>
-                  <span className={`badge ${m.status}`}>
-                    <span className="dot" />
-                    {m.status.replace("_", " ")}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
