@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import NotificationCenter from "./NotificationCenter";
 import VoiceControl from "./VoiceControl";
+import MemorySearch from "./MemorySearch";
 import {
   MdDashboard,
   MdRocketLaunch,
@@ -132,6 +133,7 @@ export default function Layout() {
         <div style={{ position: "relative" }}>
           <VoiceControl />
           <NotificationCenter />
+          <MemorySearch />
         </div>
         <Outlet />
       </main>

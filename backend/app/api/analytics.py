@@ -5,19 +5,21 @@ Endpoints:
   GET /api/analytics/overview    — high-level counts and status breakdown
   GET /api/analytics/activity    — mission/agent activity over time
   GET /api/analytics/health      — system health metrics
+  GET /api/analytics/memory      — semantic memory search
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.core.websocket_manager import manager
+from app.core.memory import memory_palace
 from app.models.agent import Agent
 from app.models.agent_mission import AgentMission
 from app.models.audit_log import AuditLog
@@ -250,3 +252,37 @@ async def audit_log(
         }
         for e in entries
     ]
+
+
+@router.get("/memory")
+async def memory_search(
+    query: str = Query(..., min_length=1),
+    _user: User = Depends(get_current_user),
+):
+    """
+    Perform a semantic search across the Memory Palace.
+    """
+    # Search across all collections
+    missions = await memory_palace.recall_memories("missions", query, n_results=3)
+    banter = await memory_palace.recall_memories("banter", query, n_results=3)
+    code = await memory_palace.recall_memories("code", query, n_results=3)
+
+    # Combine and label
+    all_memories = []
+    for m in missions:
+        m["metadata"]["collection"] = "Mission"
+        all_memories.append(m)
+    for b in banter:
+        b["metadata"]["collection"] = "Banter"
+        all_memories.append(b)
+    for c in code:
+        c["metadata"]["collection"] = "Code"
+        all_memories.append(c)
+
+    # Sort by distance (relevance)
+    all_memories.sort(key=lambda x: x["distance"])
+
+    return {
+        "query": query,
+        "memories": all_memories[:10]
+    }

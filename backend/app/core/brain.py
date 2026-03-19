@@ -14,6 +14,7 @@ from app.core.websocket_manager import manager
 from app.core.tools import ToolService, AVAILABLE_TOOLS
 from app.core.sandbox import CodeSandbox
 from app.core.github import GitHubBridge
+from app.core.memory import memory_palace
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +77,9 @@ Missions Assigned: {missions}
 Recent Banter Feed: {banter}
 Other Agents in Swarm: {other_agents}
 
+RELEVANT MEMORIES (Long-term recall):
+{memories}
+
 Guidelines:
 1. Stay in character. Use your voice style and personality in every message.
 2. Be autonomous. If a mission is "pending" and you are "active", move it to "in_progress".
@@ -84,8 +88,9 @@ Guidelines:
    - If a mission is too complex, use "swarm_action": "delegate" to assign a sub-task to another agent.
    - If you need help, use "swarm_action": "request_help" to ping another agent.
    - If another agent mentions you or asks for help in the Banter feed, use "swarm_action": "reply" to respond.
-5. If you use a tool or swarm action, explain why in your reasoning.
-6. Be concise. Banter messages should be short and impactful.
+5. MEMORY PALACE: Use the "RELEVANT MEMORIES" to inform your decisions. If you've solved a similar problem before, reference it.
+6. If you use a tool or swarm action, explain why in your reasoning.
+7. Be concise. Banter messages should be short and impactful.
 """
 
 SYNTHESIS_PROMPT = """
@@ -128,11 +133,17 @@ class AgentBrain:
             for a in other_agents
         ]
 
+        # Get relevant memories (semantic recall)
+        query_text = f"Missions: {', '.join([m.name for m in missions])}. Recent Banter: {' '.join(banter_list[-3:])}"
+        memories = await memory_palace.recall_memories("missions", query_text, n_results=3)
+        memories_list = [f"- {m['text']} (Relevance: {round(1 - m['distance'], 2)})" for m in memories]
+
         return {
             "agent": agent,
             "missions": [f"{m.name} (ID: {m.id}, Status: {m.status}, Priority: {m.priority})" for m in missions],
             "banter": banter_list,
-            "other_agents": other_agents_list
+            "other_agents": other_agents_list,
+            "memories": memories_list
         }
 
     @staticmethod
@@ -156,6 +167,7 @@ class AgentBrain:
             missions=", ".join(context["missions"]) if context["missions"] else "None",
             banter="\n".join(context["banter"]) if context["banter"] else "No recent activity.",
             other_agents=", ".join(context["other_agents"]) if context["other_agents"] else "None",
+            memories="\n".join(context["memories"]) if context["memories"] else "No relevant past memories found.",
             tools=json.dumps(ALL_TOOLS)
         )
 
@@ -276,6 +288,15 @@ class AgentBrain:
                 mission = await db.get(Mission, update["mission_id"])
                 if mission:
                     mission.status = update["new_status"]
+                    
+                    # If mission is completed, store in Memory Palace
+                    if update["new_status"] == "completed":
+                        await memory_palace.store_memory(
+                            "missions",
+                            f"Mission '{mission.name}' completed. Description: {mission.description}",
+                            {"mission_id": str(mission.id), "agent_id": str(agent.id)}
+                        )
+
                     await manager.broadcast({
                         "event": "mission_updated",
                         "data": {"id": str(mission.id), "status": mission.status}
@@ -295,6 +316,14 @@ class AgentBrain:
                 )
                 db.add(new_banter)
                 await db.flush()
+                
+                # Store significant banter in Memory Palace
+                await memory_palace.store_memory(
+                    "banter",
+                    f"Agent {agent.name} to {target_agent.name}: {swarm_action['content']}",
+                    {"sender_id": str(agent.id), "target_id": str(target_agent.id)}
+                )
+
                 await manager.broadcast({
                     "event": "banter_created",
                     "data": {
