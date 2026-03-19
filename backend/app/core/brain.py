@@ -12,12 +12,42 @@ from app.models.banter import Banter
 from app.models.agent_mission import AgentMission
 from app.core.websocket_manager import manager
 from app.core.tools import ToolService, AVAILABLE_TOOLS
+from app.core.sandbox import CodeSandbox
+from app.core.github import GitHubBridge
 
 logger = logging.getLogger(__name__)
 
 # Initialize Gemini client
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+
+# ---------------------------------------------------------------------------
+# Coding Tools Definition
+# ---------------------------------------------------------------------------
+CODING_TOOLS = {
+    "execute_python": {
+        "description": "Execute Python code in a secure sandbox and return stdout/stderr.",
+        "parameters": {"code": "string (Python code to execute)"}
+    },
+    "execute_shell": {
+        "description": "Execute a safe shell command (ls, cat, grep, etc.) in the sandbox.",
+        "parameters": {"command": "string (Shell command to execute)"}
+    },
+    "github_fetch_repo": {
+        "description": "List contents of a GitHub repository path.",
+        "parameters": {"owner": "string", "repo": "string", "path": "string (optional)"}
+    },
+    "github_fetch_file": {
+        "description": "Fetch the raw content of a file from a GitHub repository.",
+        "parameters": {"owner": "string", "repo": "string", "path": "string"}
+    },
+    "github_create_pr": {
+        "description": "Create a new Pull Request on GitHub.",
+        "parameters": {"owner": "string", "repo": "string", "title": "string", "body": "string", "head": "string", "base": "string (optional)"}
+    }
+}
+
+ALL_TOOLS = {**AVAILABLE_TOOLS, **CODING_TOOLS}
 
 SYSTEM_PROMPT = """
 You are the "Brain" of an autonomous agent in the Swarm Suite. 
@@ -49,7 +79,7 @@ Other Agents in Swarm: {other_agents}
 Guidelines:
 1. Stay in character. Use your voice style and personality in every message.
 2. Be autonomous. If a mission is "pending" and you are "active", move it to "in_progress".
-3. Use tools when you need real-world information to complete a mission.
+3. Use tools when you need real-world information or to perform technical tasks (coding, GitHub).
 4. SWARM INTELLIGENCE: 
    - If a mission is too complex, use "swarm_action": "delegate" to assign a sub-task to another agent.
    - If you need help, use "swarm_action": "request_help" to ping another agent.
@@ -126,7 +156,7 @@ class AgentBrain:
             missions=", ".join(context["missions"]) if context["missions"] else "None",
             banter="\n".join(context["banter"]) if context["banter"] else "No recent activity.",
             other_agents=", ".join(context["other_agents"]) if context["other_agents"] else "None",
-            tools=json.dumps(AVAILABLE_TOOLS)
+            tools=json.dumps(ALL_TOOLS)
         )
 
         try:
@@ -158,7 +188,10 @@ class AgentBrain:
         params = tool_use.get("parameters", {})
         
         # 1. Notify about tool use
-        tool_msg = f"Agent {agent.name} is using tool '{tool_name}' with params: {json.dumps(params)}"
+        tool_msg = f"Agent {agent.name} is using tool '{tool_name}'"
+        if tool_name in ["execute_python", "execute_shell"]:
+            tool_msg += " in the secure sandbox."
+        
         new_banter = Banter(
             message=tool_msg,
             message_type="status_update",
@@ -186,6 +219,18 @@ class AgentBrain:
             tool_result = await ToolService.web_search(params.get("query", ""))
         elif tool_name == "fetch_content":
             tool_result = await ToolService.fetch_content(params.get("url", ""))
+        elif tool_name == "execute_python":
+            res = await CodeSandbox.execute_python(params.get("code", ""))
+            tool_result = res.to_dict()
+        elif tool_name == "execute_shell":
+            res = await CodeSandbox.execute_shell(params.get("command", ""))
+            tool_result = res.to_dict()
+        elif tool_name == "github_fetch_repo":
+            tool_result = await GitHubBridge.fetch_repo_contents(params.get("owner", ""), params.get("repo", ""), params.get("path", ""))
+        elif tool_name == "github_fetch_file":
+            tool_result = await GitHubBridge.fetch_file_content(params.get("owner", ""), params.get("repo", ""), params.get("path", ""))
+        elif tool_name == "github_create_pr":
+            tool_result = await GitHubBridge.create_pull_request(params.get("owner", ""), params.get("repo", ""), params.get("title", ""), params.get("body", ""), params.get("head", ""), params.get("base", "main"))
         
         if not tool_result:
             return action
