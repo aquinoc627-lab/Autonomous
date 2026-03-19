@@ -136,4 +136,17 @@ export const toolsAPI = {
     }),
 };
 
+// ── Playbooks ────────────────────────────────────────────────────
+export const playbooksAPI = {
+  list: (params) => api.get("/api/playbooks", { params }),
+  categories: () => api.get("/api/playbooks/categories"),
+  stats: () => api.get("/api/playbooks/stats"),
+  get: (id) => api.get(`/api/playbooks/${id}`),
+  execute: (data) => api.post("/api/playbooks/execute", data),
+  executions: () => api.get("/api/playbooks/executions/list"),
+  getExecution: (id) => api.get(`/api/playbooks/executions/${id}`),
+  stepAction: (execId, action) =>
+    api.post(`/api/playbooks/executions/${execId}/step`, { action }),
+};
+
 export default api;

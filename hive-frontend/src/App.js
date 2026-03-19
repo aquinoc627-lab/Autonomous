@@ -12,6 +12,9 @@ import Banter from "./Banter";
 import Analytics from "./Analytics";
 import AgentLab from "./AgentLab";
 import ToolArsenal from "./ToolArsenal";
+import Playbooks from "./Playbooks";
+import Terminal from "./Terminal";
+import KnowledgeGraph from "./KnowledgeGraph";
 import "./neonTheme.css";
 
 const queryClient = new QueryClient({
@@ -64,6 +67,9 @@ function AppRoutes() {
         <Route path="agents" element={<Agents />} />
         <Route path="lab" element={<AgentLab />} />
         <Route path="arsenal" element={<ToolArsenal />} />
+        <Route path="playbooks" element={<Playbooks />} />
+        <Route path="terminal" element={<Terminal />} />
+        <Route path="knowledge" element={<KnowledgeGraph />} />
         <Route path="banter" element={<Banter />} />
         <Route path="analytics" element={<Analytics />} />
       </Route>

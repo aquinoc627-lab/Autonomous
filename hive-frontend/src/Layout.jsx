@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import NotificationCenter from "./NotificationCenter";
 import VoiceControl from "./VoiceControl";
@@ -15,39 +15,243 @@ import {
   MdClose,
   MdBuild,
   MdSecurity,
+  MdTerminal,
+  MdPlaylistPlay,
+  MdAccountTree,
+  MdWarning,
+  MdCircle,
+  MdMoreHoriz,
+  MdGavel,
 } from "react-icons/md";
 
+/* ================================================================
+   SYSTEM STATUS BAR
+   Shows backend health, AI status, version info
+   ================================================================ */
+function SystemStatusBar({ user }) {
+  const [backendStatus, setBackendStatus] = useState("checking");
+  const [agentCount, setAgentCount] = useState(0);
+  const [uptime, setUptime] = useState(null);
+
+  const checkHealth = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL || "http://localhost:8000"}/api/analytics/health`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setBackendStatus("online");
+        setAgentCount(data.active_agents ?? data.agents?.active ?? 0);
+        setUptime(data.uptime_seconds ?? null);
+      } else {
+        setBackendStatus("degraded");
+      }
+    } catch {
+      setBackendStatus("offline");
+    }
+  }, []);
+
+  useEffect(() => {
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000);
+    return () => clearInterval(interval);
+  }, [checkHealth]);
+
+  const statusColor =
+    backendStatus === "online"
+      ? "var(--neon-green)"
+      : backendStatus === "degraded"
+      ? "var(--neon-yellow)"
+      : "var(--neon-red)";
+
+  const formatUptime = (seconds) => {
+    if (!seconds) return "";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  };
+
+  return (
+    <div className="system-status-bar">
+      <div className="status-bar-left">
+        <div className="status-indicator" style={{ "--status-color": statusColor }}>
+          <MdCircle className="status-pulse" />
+          <span className="status-text">
+            {backendStatus === "online"
+              ? "AI ONLINE"
+              : backendStatus === "degraded"
+              ? "DEGRADED"
+              : "OFFLINE"}
+          </span>
+        </div>
+        <div className="status-divider" />
+        <span className="status-meta">
+          <MdSmartToy style={{ fontSize: 14 }} /> {agentCount} Active Agents
+        </span>
+        {uptime && (
+          <>
+            <div className="status-divider" />
+            <span className="status-meta">Uptime: {formatUptime(uptime)}</span>
+          </>
+        )}
+      </div>
+      <div className="status-bar-right">
+        <span className="status-version">theHIVE v2.0</span>
+        <span className="status-role">{user?.role?.toUpperCase()}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   AUTHORIZATION DISCLAIMER BANNER
+   Legal notice for authorized security assessments only
+   ================================================================ */
+function AuthBanner() {
+  const [dismissed, setDismissed] = useState(() => {
+    return sessionStorage.getItem("auth_banner_dismissed") === "true";
+  });
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    sessionStorage.setItem("auth_banner_dismissed", "true");
+  };
+
+  if (dismissed) return null;
+
+  return (
+    <div className="auth-disclaimer-banner">
+      <div className="auth-banner-content">
+        <MdGavel className="auth-banner-icon" />
+        <div className="auth-banner-text">
+          <strong>Authorized Use Only</strong> — This platform is intended for
+          authorized security assessments and penetration testing only. Unauthorized
+          access to computer systems is a violation of the Computer Fraud and Abuse
+          Act (CFAA), the Computer Misuse Act (CMA), and equivalent laws in your
+          jurisdiction. By using theHIVE, you confirm that you have explicit written
+          authorization to test the target systems.
+        </div>
+        <button className="auth-banner-dismiss" onClick={handleDismiss} title="Dismiss">
+          <MdClose />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   MOBILE BOTTOM NAV
+   Shown only on screens <= 480px
+   ================================================================ */
+function BottomNav() {
+  const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const primaryLinks = [
+    { to: "/", icon: <MdDashboard />, label: "Dashboard", exact: true },
+    { to: "/arsenal", icon: <MdSecurity />, label: "Arsenal" },
+    { to: "/playbooks", icon: <MdPlaylistPlay />, label: "Ops" },
+    { to: "/terminal", icon: <MdTerminal />, label: "Terminal" },
+  ];
+
+  const moreLinks = [
+    { to: "/missions", icon: <MdRocketLaunch />, label: "Missions" },
+    { to: "/agents", icon: <MdSmartToy />, label: "Agents" },
+    { to: "/banter", icon: <MdChat />, label: "Banter" },
+    { to: "/analytics", icon: <MdBarChart />, label: "Analytics" },
+    { to: "/lab", icon: <MdBuild />, label: "Agent Lab" },
+    { to: "/knowledge", icon: <MdAccountTree />, label: "Intel Graph" },
+  ];
+
+  const isActive = (to, exact) =>
+    exact ? location.pathname === to : location.pathname.startsWith(to);
+
+  const isMoreActive = moreLinks.some((l) => isActive(l.to, false));
+
+  return (
+    <>
+      {moreOpen && (
+        <div className="bottom-nav-more-overlay" onClick={() => setMoreOpen(false)}>
+          <div className="bottom-nav-more-menu" onClick={(e) => e.stopPropagation()}>
+            {moreLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={`bottom-nav-more-item ${isActive(link.to, false) ? "active" : ""}`}
+                onClick={() => setMoreOpen(false)}
+              >
+                {link.icon}
+                <span>{link.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      )}
+      <nav className="bottom-nav">
+        {primaryLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end={link.exact}
+            className={`bottom-nav-item ${isActive(link.to, link.exact) ? "active" : ""}`}
+          >
+            {link.icon}
+            <span>{link.label}</span>
+          </NavLink>
+        ))}
+        <button
+          className={`bottom-nav-item ${isMoreActive || moreOpen ? "active" : ""}`}
+          onClick={() => setMoreOpen(!moreOpen)}
+        >
+          <MdMoreHoriz />
+          <span>More</span>
+        </button>
+      </nav>
+    </>
+  );
+}
+
+/* ================================================================
+   LAYOUT COMPONENT
+   ================================================================ */
 export default function Layout() {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth > 480 && window.innerWidth <= 768
+  );
 
-  // Close sidebar on route change
   useEffect(() => {
     const handleRouteChange = () => setSidebarOpen(false);
     window.addEventListener("popstate", handleRouteChange);
     return () => window.removeEventListener("popstate", handleRouteChange);
   }, []);
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth <= 768;
-      setIsMobile(mobile);
-      if (!mobile) setSidebarOpen(false);
+      const w = window.innerWidth;
+      setIsMobile(w <= 480);
+      setIsTablet(w > 480 && w <= 768);
+      if (w > 768) setSidebarOpen(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close sidebar when clicking outside on mobile
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isTablet) return;
     const handleClickOutside = (e) => {
       const sidebar = document.querySelector(".sidebar");
       const menuBtn = document.querySelector(".mobile-menu-btn");
-      if (sidebar && !sidebar.contains(e.target) && !menuBtn?.contains(e.target)) {
+      if (
+        sidebar &&
+        !sidebar.contains(e.target) &&
+        !menuBtn?.contains(e.target)
+      ) {
         setSidebarOpen(false);
       }
     };
@@ -55,92 +259,126 @@ export default function Layout() {
       document.addEventListener("click", handleClickOutside);
       return () => document.removeEventListener("click", handleClickOutside);
     }
-  }, [sidebarOpen, isMobile]);
+  }, [sidebarOpen, isTablet]);
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   return (
-    <div className="app-layout">
-      {/* Mobile menu button */}
-      {isMobile && (
+    <div className={`app-layout ${isMobile ? "mobile-layout" : ""}`}>
+      {/* Tablet menu button */}
+      {isTablet && (
         <button
           className="mobile-menu-btn"
-          onClick={toggleSidebar}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
           aria-label="Toggle menu"
         >
           {sidebarOpen ? <MdClose size={24} /> : <MdMenu size={24} />}
         </button>
       )}
 
-      {/* Sidebar overlay for mobile */}
-      {isMobile && sidebarOpen && (
+      {/* Sidebar overlay for tablet */}
+      {isTablet && sidebarOpen && (
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`sidebar ${sidebarOpen ? "mobile-open" : ""}`}>
-        <div className="sidebar-logo">
-          <img src="/logo192.png" alt="theHIVE" style={{ width: 36, height: 36, borderRadius: 8, filter: "drop-shadow(0 0 10px var(--neon-cyan))" }} />
-          <h1>theHIVE</h1>
-        </div>
-
-        <nav className="sidebar-nav">
-          <NavLink to="/" end onClick={() => setSidebarOpen(false)}>
-            <MdDashboard /> <span>theHIVE View</span>
-          </NavLink>
-          <NavLink to="/missions" onClick={() => setSidebarOpen(false)}>
-            <MdRocketLaunch /> <span>Missions</span>
-          </NavLink>
-          <NavLink to="/agents" onClick={() => setSidebarOpen(false)}>
-            <MdSmartToy /> <span>Agents</span>
-          </NavLink>
-          <NavLink to="/banter" onClick={() => setSidebarOpen(false)}>
-            <MdChat /> <span>Banter</span>
-          </NavLink>
-          <NavLink to="/analytics" onClick={() => setSidebarOpen(false)}>
-            <MdBarChart /> <span>Analytics</span>
-          </NavLink>
-          <NavLink to="/lab" onClick={() => setSidebarOpen(false)}>
-            <MdBuild /> <span>Agent Lab</span>
-          </NavLink>
-          <NavLink to="/arsenal" onClick={() => setSidebarOpen(false)}>
-            <MdSecurity /> <span>Tool Arsenal</span>
-          </NavLink>
-
-          <div style={{ flex: 1 }} />
-
-          <button onClick={handleLogout}>
-            <MdLogout /> <span>Logout</span>
-          </button>
-        </nav>
-
-        {user && (
-          <div className="sidebar-user">
-            <div className="avatar">
-              {user.username.charAt(0).toUpperCase()}
-            </div>
-            <div className="user-info">
-              <div className="name">{user.username}</div>
-              <div className="role">{user.role}</div>
-            </div>
+      {/* Desktop/Tablet Sidebar — hidden on mobile */}
+      {!isMobile && (
+        <aside className={`sidebar ${sidebarOpen ? "mobile-open" : ""}`}>
+          <div className="sidebar-logo">
+            <img
+              src="/logo192.png"
+              alt="theHIVE"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                filter: "drop-shadow(0 0 10px var(--neon-cyan))",
+              }}
+            />
+            <h1>theHIVE</h1>
           </div>
-        )}
-      </aside>
 
-      <main className="main-content">
+          <nav className="sidebar-nav">
+            <NavLink to="/" end onClick={() => setSidebarOpen(false)}>
+              <MdDashboard /> <span>theHIVE View</span>
+            </NavLink>
+            <NavLink to="/missions" onClick={() => setSidebarOpen(false)}>
+              <MdRocketLaunch /> <span>Missions</span>
+            </NavLink>
+            <NavLink to="/agents" onClick={() => setSidebarOpen(false)}>
+              <MdSmartToy /> <span>Agents</span>
+            </NavLink>
+            <NavLink to="/banter" onClick={() => setSidebarOpen(false)}>
+              <MdChat /> <span>Banter</span>
+            </NavLink>
+            <NavLink to="/analytics" onClick={() => setSidebarOpen(false)}>
+              <MdBarChart /> <span>Analytics</span>
+            </NavLink>
+
+            <div className="sidebar-section-label">Operations</div>
+
+            <NavLink to="/arsenal" onClick={() => setSidebarOpen(false)}>
+              <MdSecurity /> <span>Tool Arsenal</span>
+            </NavLink>
+            <NavLink to="/playbooks" onClick={() => setSidebarOpen(false)}>
+              <MdPlaylistPlay /> <span>Playbooks</span>
+            </NavLink>
+            <NavLink to="/terminal" onClick={() => setSidebarOpen(false)}>
+              <MdTerminal /> <span>Terminal</span>
+            </NavLink>
+            <NavLink to="/knowledge" onClick={() => setSidebarOpen(false)}>
+              <MdAccountTree /> <span>Intel Graph</span>
+            </NavLink>
+
+            <div className="sidebar-section-label">System</div>
+
+            <NavLink to="/lab" onClick={() => setSidebarOpen(false)}>
+              <MdBuild /> <span>Agent Lab</span>
+            </NavLink>
+
+            <div style={{ flex: 1 }} />
+
+            <button onClick={handleLogout}>
+              <MdLogout /> <span>Logout</span>
+            </button>
+          </nav>
+
+          {user && (
+            <div className="sidebar-user">
+              <div className="avatar">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <div className="user-info">
+                <div className="name">{user.username}</div>
+                <div className="role">{user.role}</div>
+              </div>
+            </div>
+          )}
+        </aside>
+      )}
+
+      <main className={`main-content ${isMobile ? "main-content-mobile" : ""}`}>
+        {/* System Status Bar */}
+        <SystemStatusBar user={user} />
+
+        {/* Authorization Disclaimer Banner */}
+        <AuthBanner />
+
+        {/* Utility Controls */}
         <div style={{ position: "relative" }}>
           <VoiceControl />
           <NotificationCenter />
           <MemorySearch />
         </div>
+
         <Outlet />
       </main>
+
+      {/* Mobile Bottom Nav */}
+      {isMobile && <BottomNav />}
     </div>
   );
 }

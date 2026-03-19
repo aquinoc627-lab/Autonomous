@@ -443,3 +443,31 @@
     flex-wrap: wrap;
   }
 }
+
+/* ── Quick Launch Button ───────────────────────────────────────── */
+.tool-quick-launch-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  background: rgba(57, 255, 20, 0.08);
+  color: #39ff14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.tool-quick-launch-btn:hover {
+  background: rgba(57, 255, 20, 0.2);
+  border-color: #39ff14;
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.4);
+  transform: scale(1.1);
+}
+
+.tool-quick-launch-btn:active {
+  transform: scale(0.95);
+}

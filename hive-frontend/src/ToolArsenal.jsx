@@ -62,9 +62,14 @@ const OS_META = {
 /* ================================================================
    TOOL CARD COMPONENT
    ================================================================ */
-function ToolCard({ tool, onSelect, isSelected }) {
+function ToolCard({ tool, onSelect, isSelected, onQuickLaunch }) {
   const sev = SEVERITY_META[tool.severity] || SEVERITY_META.info;
   const cat = CATEGORY_META[tool.category] || { icon: "🔧", color: "#888" };
+
+  const handleQuickLaunch = (e) => {
+    e.stopPropagation();
+    if (onQuickLaunch) onQuickLaunch(tool);
+  };
 
   return (
     <div
@@ -78,13 +83,24 @@ function ToolCard({ tool, onSelect, isSelected }) {
           <h4 className="tool-card-name">{tool.name}</h4>
           <span className="tool-card-id">#{tool.id}</span>
         </div>
-        <div
-          className="tool-card-severity"
-          style={{ background: sev.bg, color: sev.color }}
-          title={`Severity: ${sev.label}`}
-        >
-          {sev.icon}
-          <span>{sev.label}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {!tool.requires_confirmation && (
+            <button
+              className="tool-quick-launch-btn"
+              onClick={handleQuickLaunch}
+              title="Quick Launch with defaults"
+            >
+              <MdPlayArrow />
+            </button>
+          )}
+          <div
+            className="tool-card-severity"
+            style={{ background: sev.bg, color: sev.color }}
+            title={`Severity: ${sev.label}`}
+          >
+            {sev.icon}
+            <span>{sev.label}</span>
+          </div>
         </div>
       </div>
 
@@ -492,6 +508,23 @@ export default function ToolArsenal() {
     setSelectedTool((prev) => (prev?.id === tool.id ? null : tool));
   }, []);
 
+  const handleQuickLaunch = useCallback(async (tool) => {
+    try {
+      const res = await toolsAPI.generate(tool.id, tool.os_support[0] || "linux", {});
+      const data = res.data;
+      if (data.command) {
+        await navigator.clipboard.writeText(data.command);
+        // Use a simple alert-style notification since we don't have addToast here
+        const event = new CustomEvent("hive-toast", {
+          detail: { message: `Quick Launch: ${tool.name} command copied!`, type: "success" },
+        });
+        window.dispatchEvent(event);
+      }
+    } catch (err) {
+      console.error("Quick launch failed:", err);
+    }
+  }, []);
+
   if (catLoading) {
     return (
       <div style={{ padding: 40, textAlign: "center", color: "var(--neon-cyan)" }}>
@@ -638,6 +671,7 @@ export default function ToolArsenal() {
                 tool={tool}
                 onSelect={handleSelectTool}
                 isSelected={selectedTool?.id === tool.id}
+                onQuickLaunch={handleQuickLaunch}
               />
             ))
           )}
