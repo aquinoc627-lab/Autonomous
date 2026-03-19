@@ -27,8 +27,9 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <h1>SWARM SUITE</h1>
-        <p className="subtitle">Orchestration Command Center</p>
+        <img src="/logo512.png" alt="theHIVE" style={{ width: 120, height: 120, borderRadius: 16, marginBottom: 16, filter: "drop-shadow(0 0 20px rgba(0, 255, 255, 0.4))" }} />
+        <h1>theHIVE</h1>
+        <p className="subtitle">Autonomous AI Command Center</p>
         {error && <div className="error-msg">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">

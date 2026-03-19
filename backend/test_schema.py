@@ -21,7 +21,7 @@ async def main() -> None:
 
     # 1. Print all registered tables
     print("=" * 60)
-    print("SWARM SUITE — Schema Validation")
+    print("theHIVE — Schema Validation")
     print("=" * 60)
     print(f"\nDatabase URL: {engine.url}")
     print(f"\nRegistered tables ({len(Base.metadata.tables)}):")

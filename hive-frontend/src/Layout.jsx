@@ -85,7 +85,7 @@ export default function Layout() {
 
       <aside className={`sidebar ${sidebarOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-logo">
-          <img src="/favicon.png" alt="theHIVE" style={{ width: 32, height: 32, filter: "drop-shadow(0 0 8px var(--neon-cyan))" }} />
+          <img src="/logo192.png" alt="theHIVE" style={{ width: 36, height: 36, borderRadius: 8, filter: "drop-shadow(0 0 10px var(--neon-cyan))" }} />
           <h1>theHIVE</h1>
         </div>
 
