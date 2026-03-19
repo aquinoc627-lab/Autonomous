@@ -1,9 +1,7 @@
-import requests
+import aiohttp
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
 import logging
-import json
-import re
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +20,7 @@ class ToolService:
         logger.info(f"Performing web search for: {query}")
         
         # Mock search results for demonstration
-        # In a real app, you'd use: requests.get(f"https://api.search.com?q={query}")
+        # In a real app, you'd use an async HTTP client against a search API.
         mock_results = [
             {
                 "title": f"Latest news on {query}",
@@ -47,6 +45,7 @@ class ToolService:
     async def fetch_content(url: str) -> Optional[str]:
         """
         Fetch and extract the main text content from a given URL.
+        Uses aiohttp for non-blocking async I/O to avoid stalling the event loop.
         """
         logger.info(f"Fetching content from: {url}")
         try:
@@ -54,12 +53,15 @@ class ToolService:
             if not url.startswith(("http://", "https://")):
                 return "Error: Invalid URL protocol. Must be http or https."
 
-            response = requests.get(url, timeout=10, headers={
+            headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-            })
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
+            }
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=10), headers=headers) as response:
+                    response.raise_for_status()
+                    html = await response.text()
+
+            soup = BeautifulSoup(html, 'html.parser')
             
             # Remove script and style elements
             for script in soup(["script", "style"]):
