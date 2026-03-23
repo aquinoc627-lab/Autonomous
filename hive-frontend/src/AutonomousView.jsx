@@ -152,10 +152,10 @@ export default function HiveView() {
 
       {activeTab === "grid" ? (
         <>
-          {/* Animated Agent Autonomous Grid */}
+          {/* Animated Autonomous Agent Grid */}
           <div className="panel" style={{ marginBottom: 24 }}>
             <div className="panel-header">
-              <h3>Agent Autonomous</h3>
+              <h3>Autonomous Agents</h3>
               <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
                 Click an agent to inspect
               </span>
