@@ -1,7 +1,7 @@
-# theHIVE — Kali Linux WSL 2 Installation Guide
+# Autonomous — Kali Linux WSL 2 Installation Guide
 **Tailored for HP EliteBook 840 G10 (Windows 11)**
 
-This guide provides step-by-step instructions for deploying **theHIVE** on an HP EliteBook 840 G10 using Kali Linux via Windows Subsystem for Linux (WSL 2). This is the **recommended deployment method** as it provides native execution for all 44 penetration testing tools in the Tool Arsenal while maintaining the convenience of your Windows 11 host environment.
+This guide provides step-by-step instructions for deploying **Autonomous** on an HP EliteBook 840 G10 using Kali Linux via Windows Subsystem for Linux (WSL 2). This is the **recommended deployment method** as it provides native execution for all 44 penetration testing tools in the Tool Arsenal while maintaining the convenience of your Windows 11 host environment.
 
 ---
 
@@ -36,7 +36,7 @@ Windows 11 makes installing WSL 2 incredibly straightforward.
 
 ## Phase 3: Prepare the Kali Environment
 
-Now that Kali is installed, we need to update the package repositories and install the necessary dependencies for theHIVE.
+Now that Kali is installed, we need to update the package repositories and install the necessary dependencies for Autonomous.
 
 1. Open the **Kali Linux** app from your Windows Start menu.
 2. Update the system packages:
@@ -47,21 +47,21 @@ Now that Kali is installed, we need to update the package repositories and insta
    ```bash
    sudo apt install -y python3 python3-pip python3-venv nodejs npm git curl build-essential
    ```
-4. Install common penetration testing tools used by theHIVE's Tool Arsenal:
+4. Install common penetration testing tools used by Autonomous's Tool Arsenal:
    ```bash
    sudo apt install -y nmap masscan sqlmap hydra john aircrack-ng wireshark tcpdump
    ```
 
 ---
 
-## Phase 4: Clone and Configure theHIVE
+## Phase 4: Clone and Configure Autonomous
 
 With the environment ready, you can now deploy the platform.
 
 1. Clone the repository into your Kali home directory:
    ```bash
-   git clone https://github.com/aquinoc627-lab/swarm-suite.git
-   cd swarm-suite
+   git clone https://github.com/aquinoc627-lab/autonomous.git
+   cd autonomous
    ```
 2. Copy the environment template:
    ```bash
@@ -77,12 +77,12 @@ With the environment ready, you can now deploy the platform.
 
 ## Phase 5: Launch the Platform
 
-theHIVE runs as two separate processes: the FastAPI backend and the React frontend.
+Autonomous runs as two separate processes: the FastAPI backend and the React frontend.
 
 ### Start the Backend
 1. Navigate to the backend directory:
    ```bash
-   cd ~/swarm-suite/backend
+   cd ~/autonomous/backend
    ```
 2. Install Python dependencies:
    ```bash
@@ -102,7 +102,7 @@ theHIVE runs as two separate processes: the FastAPI backend and the React fronte
 1. Open a **new** Kali terminal tab (or run in the same terminal).
 2. Navigate to the frontend directory:
    ```bash
-   cd ~/swarm-suite/hive-frontend
+   cd ~/autonomous/hive-frontend
    ```
 3. Install Node dependencies:
    ```bash
@@ -127,4 +127,4 @@ Log in using the default administrator credentials:
 
 - **"Virtual Machine Platform is not enabled" Error:** If you receive this error when running `wsl --install`, double-check that you saved the BIOS settings in Phase 1. You can also manually enable it in Windows by searching for "Turn Windows features on or off" and checking "Virtual Machine Platform".
 - **Port Conflicts:** If port 8000 or 3000 is already in use by another Windows application, the servers will fail to start. You can change the ports in the `.env` file and `package.json`.
-- **File Permissions:** Always clone the repository *inside* the Kali filesystem (e.g., `~/swarm-suite`), **not** on the mounted Windows drive (`/mnt/c/Users/...`). Running Linux databases and node_modules on the NTFS mount is significantly slower and can cause permission errors.
+- **File Permissions:** Always clone the repository *inside* the Kali filesystem (e.g., `~/autonomous`), **not** on the mounted Windows drive (`/mnt/c/Users/...`). Running Linux databases and node_modules on the NTFS mount is significantly slower and can cause permission errors.

@@ -1,6 +1,6 @@
-# theHIVE: Windows 11 Installation & Deployment Guide
+# Autonomous: Windows 11 Installation & Deployment Guide
 
-This guide provides detailed instructions for setting up and deploying the theHIVE on a Windows 11 environment. It covers both local development setup and Docker-based deployment, ensuring a smooth experience for users on Microsoft's latest operating system.
+This guide provides detailed instructions for setting up and deploying Autonomous on a Windows 11 environment. It covers both local development setup and Docker-based deployment, ensuring a smooth experience for users on Microsoft's latest operating system.
 
 ## 1. Prerequisites
 
@@ -11,7 +11,7 @@ Before proceeding with the installation, ensure your Windows 11 system meets the
 *   **Docker Desktop**: Provides the Docker Engine and Docker Compose for containerized deployment [2].
 *   **Node.js (LTS version)**: Required for the React frontend development and build process [3].
 *   **Python 3.11+**: Necessary for the FastAPI backend [4].
-*   **Git**: For cloning the theHIVE repository [5].
+*   **Git**: For cloning Autonomous repository [5].
 
 ### 1.1. Installing WSL 2
 
@@ -49,10 +49,10 @@ Before proceeding with the installation, ensure your Windows 11 system meets the
 
 1.  Open a Command Prompt or PowerShell window.
 2.  Navigate to your desired development directory.
-3.  Clone the theHIVE repository:
+3.  Clone Autonomous repository:
     ```bash
-    git clone https://github.com/aquinoc627-lab/swarm-suite.git
-    cd swarm-suite
+    git clone https://github.com/aquinoc627-lab/autonomous.git
+    cd autonomous
     ```
 
 ## 3. Local Development Setup (Without Docker)
@@ -76,7 +76,7 @@ This method allows you to run the backend and frontend services independently fo
     ```
 4.  Set environment variables. Create a `.env` file in the `backend` directory with the following (replace with your actual keys):
     ```ini
-    DATABASE_URL="sqlite+aiosqlite:///./data/theHIVE.db"
+    DATABASE_URL="sqlite+aiosqlite:///./data/Autonomous.db"
     SECRET_KEY="your_super_secret_key_for_jwt"
     ALGORITHM="HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -102,7 +102,7 @@ This method allows you to run the backend and frontend services independently fo
 1.  Open a **new** Command Prompt or PowerShell window.
 2.  Navigate to the frontend directory:
     ```bash
-    cd swarm-suite\hive-frontend
+    cd autonomous\hive-frontend
     ```
 3.  Install frontend dependencies:
     ```bash
@@ -120,19 +120,19 @@ This method allows you to run the backend and frontend services independently fo
 
 ## 4. Docker-based Deployment (Recommended)
 
-This method uses Docker Compose to run the entire theHIVE stack (FastAPI backend, React frontend via Nginx, and PostgreSQL database) in isolated containers.
+This method uses Docker Compose to run the entire Autonomous stack (FastAPI backend, React frontend via Nginx, and PostgreSQL database) in isolated containers.
 
 1.  Ensure Docker Desktop is running.
-2.  Navigate to the root of the `swarm-suite` repository:
+2.  Navigate to the root of the `autonomous` repository:
     ```bash
-    cd swarm-suite
+    cd autonomous
     ```
 3.  Create a `.env` file in the root directory (or copy `.env.example`) with the following (replace placeholders):
     ```ini
-    POSTGRES_USER=theHIVEuser
-    POSTGRES_PASSWORD=theHIVEpassword
-    POSTGRES_DB=theHIVEdb
-    DATABASE_URL=postgresql+asyncpg://theHIVEuser:theHIVEpassword@db:5432/theHIVEdb
+    POSTGRES_USER=Autonomoususer
+    POSTGRES_PASSWORD=Autonomouspassword
+    POSTGRES_DB=Autonomousdb
+    DATABASE_URL=postgresql+asyncpg://Autonomoususer:Autonomouspassword@db:5432/Autonomousdb
     SECRET_KEY="your_super_secret_key_for_jwt"
     ALGORITHM="HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -152,7 +152,7 @@ This method uses Docker Compose to run the entire theHIVE stack (FastAPI backend
     *   Run database migrations and seed data in the backend container.
     *   Start the FastAPI backend and Nginx-served React frontend.
 
-5.  Access the theHIVE:
+5.  Access Autonomous:
     *   Frontend: `http://localhost:3000`
     *   Backend API: `http://localhost:8000`
 

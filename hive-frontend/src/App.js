@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from "./AuthContext";
 import { ToastProvider } from "./ToastContext";
 import Layout from "./Layout";
 import Login from "./Login";
-import HiveView from "./theHIVEView";
+import HiveView from "./AutonomousView";
 import Missions from "./Missions";
 import Agents from "./Agents";
 import Banter from "./Banter";
@@ -46,7 +46,7 @@ function AppRoutes() {
   if (loading) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--neon-cyan)" }}>
-        Initializing theHIVE...
+        Initializing Autonomous...
       </div>
     );
   }

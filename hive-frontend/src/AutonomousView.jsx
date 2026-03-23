@@ -4,7 +4,7 @@ import { analyticsAPI, agentsAPI, missionsAPI, banterAPI } from "./api";
 import { useWebSocket } from "./useWebSocket";
 import AgentAvatar from "./AgentAvatar";
 import { Hologram3DCanvas } from "./Hologram3D";
-import HiveGraph from "./theHIVEGraph";
+import HiveGraph from "./AutonomousGraph";
 import ARHologramViewer from "./Hologram3DXR";
 import {
   MdSmartToy,
@@ -90,7 +90,7 @@ export default function HiveView() {
   return (
     <div>
       <div className="page-header">
-        <h2>theHIVE View</h2>
+        <h2>Autonomous View</h2>
         <p>
           Real-time overview of agents and missions&nbsp;
           <span className="ws-indicator">
@@ -139,7 +139,7 @@ export default function HiveView() {
           onClick={() => setActiveTab("grid")}
           style={{ display: "flex", alignItems: "center", gap: 8 }}
         >
-          <MdGridView /> theHIVE Grid
+          <MdGridView /> Autonomous Grid
         </button>
         <button 
           className={`btn ${activeTab === "collaboration" ? "btn-primary" : "btn-secondary"}`}
@@ -152,19 +152,19 @@ export default function HiveView() {
 
       {activeTab === "grid" ? (
         <>
-          {/* Animated Agent theHIVE Grid */}
+          {/* Animated Agent Autonomous Grid */}
           <div className="panel" style={{ marginBottom: 24 }}>
             <div className="panel-header">
-              <h3>Agent theHIVE</h3>
+              <h3>Agent Autonomous</h3>
               <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
                 Click an agent to inspect
               </span>
             </div>
-            <div className="theHIVE-grid">
+            <div className="autonomous-grid">
               {agents?.map((agent) => (
                 <div
                   key={agent.id}
-                  className="theHIVE-agent-cell"
+                  className="autonomous-agent-cell"
                   onClick={() => setSelectedAgent(selectedAgent?.id === agent.id ? null : agent)}
                 >
                   <AgentAvatar

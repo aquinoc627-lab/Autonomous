@@ -137,7 +137,7 @@ Lists 4 AI interoperability protocols:
 
 ## Overall Design Observations (Cross-cutting)
 - Consistent dark theme (#0a0a0a or similar very dark background)
-- Neon yellow/amber as primary accent color (not cyan like theHIVE)
+- Neon yellow/amber as primary accent color (not cyan like Autonomous)
 - Red accents for warnings/danger
 - Green for "CONNECTED", "ONLINE", "READY" status badges
 - Dashed yellow borders on interactive cards (distinctive visual signature)
@@ -158,13 +158,13 @@ Lists 4 AI interoperability protocols:
 - Each tool card has: name, severity badge, description, tags, Configure Parameters button, play button
 - Play buttons are green triangles on the right side of each card
 
-## Key Differences from theHIVE's Current Arsenal
-- Demo has RustScan (theHIVE doesn't)
-- Demo has AI Report Generator (theHIVE doesn't have this as a standalone tool)
-- Demo has a search bar in the Arsenal (theHIVE has this too)
-- Demo uses 2-column card grid (theHIVE uses a list with detail panel)
-- Demo has inline parameter configuration (expands within card) vs theHIVE's sticky side panel
-- Demo has "Arm & Confirm" button with command preview (theHIVE has "Generate Command")
+## Key Differences from Autonomous's Current Arsenal
+- Demo has RustScan (Autonomous doesn't)
+- Demo has AI Report Generator (Autonomous doesn't have this as a standalone tool)
+- Demo has a search bar in the Arsenal (Autonomous has this too)
+- Demo uses 2-column card grid (Autonomous uses a list with detail panel)
+- Demo has inline parameter configuration (expands within card) vs Autonomous's sticky side panel
+- Demo has "Arm & Confirm" button with command preview (Autonomous has "Generate Command")
 - Demo has a play/execute button directly on each card
 
 ## Additional UI Observations

@@ -1,2 +1,2 @@
-# theHIVE Platform User Guide
+# Autonomous Platform User Guide
 ...

@@ -61,7 +61,7 @@ export default function AgentLab() {
   const createMutation = useMutation({
     mutationFn: (data) => agentsAPI.create(data),
     onSuccess: () => {
-      addToast("Agent deployed to theHIVE!", "success");
+      addToast("Agent deployed to Autonomous!", "success");
       queryClient.invalidateQueries({ queryKey: ["agents"] });
       setFormData({
         name: "",
@@ -122,7 +122,7 @@ export default function AgentLab() {
     <div className="agent-lab-container">
       <div className="page-header">
         <h2>Agent Lab</h2>
-        <p>Design and deploy new agents to your theHIVE</p>
+        <p>Design and deploy new agents to your Autonomous platform</p>
       </div>
 
       <div className="lab-grid">
@@ -236,7 +236,7 @@ export default function AgentLab() {
               disabled={createMutation.isPending}
               style={{ display: "flex", alignItems: "center", gap: 8 }}
             >
-              <MdSave /> {createMutation.isPending ? "Deploying..." : "Deploy to theHIVE"}
+              <MdSave /> {createMutation.isPending ? "Deploying..." : "Deploy to Autonomous"}
             </button>
             <button
               className="btn btn-secondary"

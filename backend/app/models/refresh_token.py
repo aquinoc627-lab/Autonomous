@@ -1,5 +1,5 @@
 """
-theHIVE — RefreshToken Model
+Autonomous — RefreshToken Model
 
 Stores hashed refresh tokens for JWT-based authentication.  This table
 enables secure token rotation and explicit revocation.

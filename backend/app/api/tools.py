@@ -1,5 +1,5 @@
 """
-theHIVE — Tool Arsenal API Router
+Autonomous — Tool Arsenal API Router
 
 Provides REST endpoints for browsing, searching, and executing tools
 from the Tool Registry.  All endpoints require authentication.

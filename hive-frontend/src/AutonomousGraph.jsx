@@ -33,14 +33,14 @@ export default function HiveGraph() {
   }, [missions]);
 
   return (
-    <div className="theHIVE-graph-container">
+    <div className="autonomous-graph-container">
       <div className="page-header">
-        <h2>theHIVE Collaboration</h2>
+        <h2>Autonomous Collaboration</h2>
         <p>Visualizing agent relationships and task delegations</p>
       </div>
 
       <div className="panel" style={{ minHeight: "500px" }}>
-        <div className="theHIVE-graph-legend">
+        <div className="autonomous-graph-legend">
           <div className="legend-item">
             <span className="legend-dot mission" /> Mission
           </div>
@@ -52,7 +52,7 @@ export default function HiveGraph() {
           </div>
         </div>
 
-        <div className="theHIVE-graph-content">
+        <div className="autonomous-graph-content">
           {topLevelMissions.map((mission) => (
             <div key={mission.id} className="mission-tree">
               <div className="mission-node">

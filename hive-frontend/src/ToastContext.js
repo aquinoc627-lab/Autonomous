@@ -1,5 +1,5 @@
 /**
- * theHIVE — Toast Notification System
+ * Autonomous — Toast Notification System
  *
  * Provides a global toast notification context and component for
  * displaying real-time alerts, success messages, and error notifications.

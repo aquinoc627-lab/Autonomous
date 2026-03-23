@@ -1,4 +1,4 @@
-# theHIVE — Backend Dockerfile
+# Autonomous — Backend Dockerfile
 # Optimized for production with FastAPI and Uvicorn
 
 FROM python:3.11-slim-buster

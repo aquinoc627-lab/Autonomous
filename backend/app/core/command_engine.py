@@ -1,5 +1,5 @@
 """
-theHIVE — Secure Command Generation Engine
+Autonomous — Secure Command Generation Engine
 
 Renders command templates from the Tool Registry into executable shell
 commands.  Every user-supplied parameter is validated against its declared

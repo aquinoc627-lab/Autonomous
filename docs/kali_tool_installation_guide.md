@@ -1,6 +1,6 @@
-# theHIVE — Kali Linux Tool Arsenal Installation Guide
+# Autonomous — Kali Linux Tool Arsenal Installation Guide
 
-This guide provides the exact installation commands for all 44 penetration testing tools supported by **theHIVE's Tool Arsenal**. While Kali Linux comes with many of these pre-installed, running these commands ensures you have the latest versions and all required dependencies for theHIVE's autonomous agents to execute them successfully.
+This guide provides the exact installation commands for all 44 penetration testing tools supported by **Autonomous's Tool Arsenal**. While Kali Linux comes with many of these pre-installed, running these commands ensures you have the latest versions and all required dependencies for Autonomous's autonomous agents to execute them successfully.
 
 ---
 
@@ -113,7 +113,7 @@ Frameworks that chain multiple tools together.
 
 ## 3. Verifying Installation
 
-Once you have installed the tools, you can verify they are accessible to theHIVE by opening the **Terminal** tab in the dashboard and running:
+Once you have installed the tools, you can verify they are accessible to Autonomous by opening the **Terminal** tab in the dashboard and running:
 
 ```bash
 tools

@@ -1,5 +1,5 @@
 """
-theHIVE — Analytics API
+Autonomous — Analytics API
 
 Endpoints:
   GET /api/analytics/overview    — high-level counts and status breakdown

@@ -1,8 +1,8 @@
-# theHIVE Database Schema
+# Autonomous Database Schema
 
 ## Overview
 
-The theHIVE database schema is designed to support a robust, real-time orchestration platform. It is built using SQLAlchemy 2.0 with asynchronous support, allowing seamless switching between SQLite for local development and PostgreSQL for production environments. The schema strictly enforces data integrity, relationships, and security constraints at the database level.
+The Autonomous database schema is designed to support a robust, real-time orchestration platform. It is built using SQLAlchemy 2.0 with asynchronous support, allowing seamless switching between SQLite for local development and PostgreSQL for production environments. The schema strictly enforces data integrity, relationships, and security constraints at the database level.
 
 ![Entity Relationship Diagram](./erd.png)
 
@@ -14,7 +14,7 @@ The schema revolves around three primary entities and their interactions, suppor
 The `users` table stores authentication and authorization data. It implements role-based access control (RBAC) via the `role` column (`admin` or `operator`). Passwords are never stored in plaintext; instead, bcrypt hashes are stored in the `hashed_password` column. The `is_active` flag allows for soft-disabling accounts without breaking foreign key constraints.
 
 ### Agents (`agents`)
-The `agents` table represents autonomous entities within the theHIVE. Each agent has a unique `name` and a `status` (`idle`, `active`, `offline`, `error`) that tracks its current operational state. Agents are linked to the user who created them via the `created_by` foreign key.
+The `agents` table represents autonomous entities within Autonomous. Each agent has a unique `name` and a `status` (`idle`, `active`, `offline`, `error`) that tracks its current operational state. Agents are linked to the user who created them via the `created_by` foreign key.
 
 ### Missions (`missions`)
 The `missions` table defines tasks or objectives. Missions progress through a defined lifecycle (`pending`, `in_progress`, `completed`, `failed`, `cancelled`) and are assigned a `priority` level. They track execution time via `started_at` and `completed_at` timestamps.

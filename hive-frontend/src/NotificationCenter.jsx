@@ -1,5 +1,5 @@
 /**
- * theHIVE — Notification Center
+ * Autonomous — Notification Center
  *
  * A slide-out panel accessible from the top bar that shows:
  *   - Recent notifications (from WebSocket events)

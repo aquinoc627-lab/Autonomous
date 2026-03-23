@@ -1,10 +1,10 @@
-# theHIVE: Comprehensive User Manual
+# Autonomous: Comprehensive User Manual
 
-Welcome to the theHIVE, your advanced platform for autonomous agent orchestration, mission management, and real-time collaboration. This manual provides a detailed overview of all features, from core functionalities to advanced AI integrations, helping you harness the full power of your intelligent theHIVE.
+Welcome to Autonomous, your advanced platform for autonomous agent orchestration, mission management, and real-time collaboration. This manual provides a detailed overview of all features, from core functionalities to advanced AI integrations, helping you harness the full power of your intelligent Autonomous.
 
-## 1. Introduction to theHIVE
+## 1. Introduction to Autonomous
 
-The theHIVE is designed to manage and coordinate a team of intelligent agents, enabling them to execute complex missions, communicate autonomously, and learn from past experiences. Featuring a neon-themed, responsive dashboard, it provides a centralized command center for all your autonomous operations.
+The Autonomous is designed to manage and coordinate a team of intelligent agents, enabling them to execute complex missions, communicate autonomously, and learn from past experiences. Featuring a neon-themed, responsive dashboard, it provides a centralized command center for all your autonomous operations.
 
 ## 2. Core Entities
 
@@ -12,26 +12,26 @@ The platform revolves around three primary entities:
 
 ### 2.1. Missions
 
-**Missions** are tasks assigned to agents. They have a `name`, `description`, `status` (e.g., `pending`, `in_progress`, `completed`, `failed`), and `priority` (e.g., `low`, `medium`, `high`, `critical`). Missions can be assigned to one or more agents, and can also be broken down into hierarchical sub-tasks for collaborative execution by the theHIVE.
+**Missions** are tasks assigned to agents. They have a `name`, `description`, `status` (e.g., `pending`, `in_progress`, `completed`, `failed`), and `priority` (e.g., `low`, `medium`, `high`, `critical`). Missions can be assigned to one or more agents, and can also be broken down into hierarchical sub-tasks for collaborative execution by Autonomous.
 
 ### 2.2. Agents
 
-**Agents** are the autonomous entities within the theHIVE. Each agent possesses a unique `name`, `status` (e.g., `idle`, `active`, `thinking`, `error`), and a distinct `persona` that dictates its behavior, voice, and visual representation. Agents can be assigned multiple missions and are capable of autonomous reasoning, tool use, and inter-agent communication.
+**Agents** are the autonomous entities within Autonomous. Each agent possesses a unique `name`, `status` (e.g., `idle`, `active`, `thinking`, `error`), and a distinct `persona` that dictates its behavior, voice, and visual representation. Agents can be assigned multiple missions and are capable of autonomous reasoning, tool use, and inter-agent communication.
 
 ### 2.3. Banter
 
-**Banter** represents the real-time communication feed within the theHIVE. It includes messages from users, agents, and system notifications. Banter messages can be filtered by mission or agent, providing contextual communication streams. Agents use the Banter feed to report progress, share findings, and collaborate.
+**Banter** represents the real-time communication feed within Autonomous. It includes messages from users, agents, and system notifications. Banter messages can be filtered by mission or agent, providing contextual communication streams. Agents use the Banter feed to report progress, share findings, and collaborate.
 
 ## 3. Dashboard Components
 
-The theHIVE dashboard is organized into several key components, each providing a unique view and set of controls for managing your autonomous operations.
+The Autonomous dashboard is organized into several key components, each providing a unique view and set of controls for managing your autonomous operations.
 
-### 3.1. theHIVE View
+### 3.1. Autonomous View
 
-The **theHIVE View** provides an overview and visual status of all active agents and missions. It features:
+The **Autonomous View** provides an overview and visual status of all active agents and missions. It features:
 *   **Agent Grid**: Displays 3D animated hologram characters for each agent, dynamically reflecting their status (idle, speaking, thinking) and persona.
 *   **Mission Overview**: Summarizes active missions, their statuses, and assigned agents.
-*   **Collaboration Graph**: A visual representation of hierarchical missions and agent-to-agent task delegations, showing how the theHIVE is working together.
+*   **Collaboration Graph**: A visual representation of hierarchical missions and agent-to-agent task delegations, showing how Autonomous is working together.
 
 ### 3.2. Mission Timeline
 
@@ -46,7 +46,7 @@ The **Mission Timeline** allows you to display and manage missions chronological
 The **Banter Panel** is the real-time chat and message feed. It supports:
 *   **Real-time Updates**: Messages appear instantly from users, agents, and system events.
 *   **Filtering**: Filter messages by specific missions or agents to focus on relevant conversations.
-*   **Compose/Send**: Send messages to the entire theHIVE or specific agents.
+*   **Compose/Send**: Send messages to the entire Autonomous or specific agents.
 *   **Agent Speech**: Click the speaker icon next to an agent's message to hear them speak in their unique persona voice.
 
 ### 3.4. Agent Control
@@ -65,14 +65,14 @@ The **Tool Arsenal** is a dedicated interface for browsing and managing the plat
 
 ### 3.6. Analytics Widgets
 
-The **Analytics Widgets** provide advanced insights into the theHIVE's performance and system health. This includes:
+The **Analytics Widgets** provide advanced insights into Autonomous's performance and system health. This includes:
 *   **Activity Graphs**: Visualize mission and agent activity over time.
 *   **System Health**: Monitor key metrics like agent availability, mission completion rates, and WebSocket connection counts.
 *   **Banter Distribution**: See trends in message types and agent communication patterns.
 
 ## 4. Advanced Features
 
-The theHIVE integrates several cutting-edge AI capabilities to enhance agent autonomy and intelligence.
+The Autonomous integrates several cutting-edge AI capabilities to enhance agent autonomy and intelligence.
 
 ### 4.1. Agent Brain (Gemini-Powered Reasoning)
 
@@ -92,24 +92,24 @@ Agents are equipped with a comprehensive **Tool Arsenal** and execution engine, 
 
 ### 4.3. Voice Interaction
 
-The "Jarvis" Voice Interaction layer provides a natural language interface for the theHIVE:
+The "Jarvis" Voice Interaction layer provides a natural language interface for Autonomous:
 *   **Voice Commands**: Use the microphone widget to control the dashboard (e.g., "Show Missions", "Assign mission X to Agent Y").
 *   **Agent Speech**: Agents can speak their Banter messages using unique, persona-matched voices. Click the speaker icon next to any agent message to hear it.
 *   **Audio Visualizations**: Agent holograms visually react to speech and listening states.
 
-### 4.4. theHIVE Intelligence (Agent-to-Agent Collaboration)
+### 4.4. Autonomous Intelligence (Agent-to-Agent Collaboration)
 
 This feature enables agents to work together on complex tasks:
 *   **Hierarchical Tasking**: A "Commander" agent can break down a large mission into smaller sub-tasks and delegate them to other "Specialist" agents.
 *   **Cross-Agent Communication**: Agents can communicate directly with each other in the Banter feed to coordinate efforts and share information.
-*   **Collaboration Graph**: Visualize the delegation and communication flow between agents in the theHIVE View.
+*   **Collaboration Graph**: Visualize the delegation and communication flow between agents in Autonomous View.
 
 ### 4.5. Memory Palace (Long-Term Vector Memory)
 
 The **Memory Palace** provides agents with persistent, semantic long-term memory:
 *   **ChromaDB Integration**: All significant mission data, code snippets, and Banter conversations are indexed into a vector database.
 *   **Semantic Recall**: Agents can semantically search and retrieve past experiences and knowledge to inform current decision-making.
-*   **Memory Search UI**: A dedicated search interface (accessible via the brain icon in the top bar) allows users to query the theHIVE's collective memory using natural language.
+*   **Memory Search UI**: A dedicated search interface (accessible via the brain icon in the top bar) allows users to query Autonomous's collective memory using natural language.
 
 ### 4.6. Autonomous Coding (DevOps Agent)
 
@@ -124,11 +124,11 @@ This feature empowers agents to interact with code and development workflows:
 The **Agent Lab** is a dedicated interface for creating and customizing your agents:
 *   **3D Hologram Preview**: Design new agents with a real-time 3D preview of their animated human-like hologram.
 *   **Persona Configuration**: Define their name, role, personality, voice style, and visual attributes (hologram color, orbiting icon).
-*   **Instant Deployment**: Deploy newly created agents directly to your live theHIVE.
+*   **Instant Deployment**: Deploy newly created agents directly to your live Autonomous.
 
 ## 5. Authentication and Authorization
 
-The theHIVE supports robust authentication and authorization:
+The Autonomous supports robust authentication and authorization:
 *   **JWT (JSON Web Tokens)**: Default authentication mechanism with secure access and refresh token rotation.
 *   **OAuth (Optional)**: Configurable to integrate with external OIDC providers like Auth0 or Okta.
 *   **Role-Based Access Control (RBAC)**: Users are assigned roles (e.g., `admin`, `operator`) which dictate their permissions and access to certain features.
@@ -145,4 +145,4 @@ Refer to the `windows_installation_guide.md` or `DEPLOYMENT.md` for specific tro
 
 ## References
 
-[1] theHIVE GitHub Repository | [https://github.com/aquinoc627-lab/swarm-suite](https://github.com/aquinoc627-lab/swarm-suite)
+[1] Autonomous GitHub Repository | [https://github.com/aquinoc627-lab/autonomous](https://github.com/aquinoc627-lab/autonomous)

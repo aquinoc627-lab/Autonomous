@@ -98,7 +98,7 @@ function SystemStatusBar({ user }) {
         )}
       </div>
       <div className="status-bar-right">
-        <span className="status-version">theHIVE v2.0</span>
+        <span className="status-version">Autonomous v2.0</span>
         <span className="status-role">{user?.role?.toUpperCase()}</span>
       </div>
     </div>
@@ -130,7 +130,7 @@ function AuthBanner() {
           authorized security assessments and penetration testing only. Unauthorized
           access to computer systems is a violation of the Computer Fraud and Abuse
           Act (CFAA), the Computer Misuse Act (CMA), and equivalent laws in your
-          jurisdiction. By using theHIVE, you confirm that you have explicit written
+          jurisdiction. By using Autonomous, you confirm that you have explicit written
           authorization to test the target systems.
         </div>
         <button className="auth-banner-dismiss" onClick={handleDismiss} title="Dismiss">
@@ -290,7 +290,7 @@ export default function Layout() {
           <div className="sidebar-logo">
             <img
               src="/logo192.png"
-              alt="theHIVE"
+              alt="Autonomous"
               style={{
                 width: 36,
                 height: 36,
@@ -298,12 +298,12 @@ export default function Layout() {
                 filter: "drop-shadow(0 0 10px var(--neon-cyan))",
               }}
             />
-            <h1>theHIVE</h1>
+            <h1>Autonomous</h1>
           </div>
 
           <nav className="sidebar-nav">
             <NavLink to="/" end onClick={() => setSidebarOpen(false)}>
-              <MdDashboard /> <span>theHIVE View</span>
+              <MdDashboard /> <span>Autonomous View</span>
             </NavLink>
             <NavLink to="/missions" onClick={() => setSidebarOpen(false)}>
               <MdRocketLaunch /> <span>Missions</span>

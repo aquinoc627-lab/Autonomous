@@ -1,5 +1,5 @@
 """
-theHIVE — Declarative Base & Common Mixins
+Autonomous — Declarative Base & Common Mixins
 
 Provides:
   - ``Base``           — the declarative base class for all ORM models
@@ -21,7 +21,7 @@ from sqlalchemy.orm import (
 
 
 class Base(DeclarativeBase):
-    """Declarative base for all theHIVE ORM models."""
+    """Declarative base for all Autonomous ORM models."""
     pass
 
 

@@ -74,7 +74,7 @@ const MemorySearch = () => {
               <div className="no-results">No relevant memories found.</div>
             ) : (
               <div className="search-placeholder">
-                Enter a query to retrieve semantic memories from the theHIVE's history.
+                Enter a query to retrieve semantic memories from the Autonomous history.
               </div>
             )}
           </div>

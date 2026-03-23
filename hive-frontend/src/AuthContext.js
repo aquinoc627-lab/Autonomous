@@ -1,5 +1,5 @@
 /**
- * theHIVE — Authentication Context
+ * Autonomous — Authentication Context
  *
  * Provides user state, login/logout functions, and role checks
  * to all child components via React Context.

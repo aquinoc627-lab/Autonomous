@@ -1,5 +1,5 @@
 """
-theHIVE — Test Configuration & Fixtures
+Autonomous — Test Configuration & Fixtures
 
 Provides:
   - An isolated in-memory SQLite database for each test session

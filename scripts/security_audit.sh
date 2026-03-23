@@ -1,10 +1,10 @@
 #!/bin/bash
-# theHIVE — Automated Security Audit Script
+# Autonomous — Automated Security Audit Script
 
 set -e
 
 echo "================================================================"
-echo "Starting theHIVE Security Audit"
+echo "Starting Autonomous Security Audit"
 echo "================================================================"
 
 # 1. Backend Dependency Audit
@@ -26,7 +26,7 @@ fi
 
 # 3. Frontend Dependency Audit
 echo -e "\n[3/4] Auditing Frontend Dependencies..."
-cd ../theHIVE-frontend
+cd ../hive-frontend
 npm audit --audit-level=high
 
 # 4. Secret Scanning (Basic)

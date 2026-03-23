@@ -1,5 +1,5 @@
 """
-theHIVE — Pydantic Schemas (Request / Response Validation)
+Autonomous — Pydantic Schemas (Request / Response Validation)
 
 Every value entering or leaving the API passes through these schemas.
 Strict validation prevents malformed data from reaching the database

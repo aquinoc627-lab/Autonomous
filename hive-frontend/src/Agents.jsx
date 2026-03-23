@@ -95,7 +95,7 @@ export default function Agents() {
       <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <h2>Agent Control</h2>
-          <p>Manage theHIVE agents, personas, and their autonomous brains</p>
+          <p>Manage Autonomous agents, personas, and their autonomous brains</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowCreate(true)}>
           <MdAdd /> New Agent

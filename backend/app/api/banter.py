@@ -1,5 +1,5 @@
 """
-theHIVE — Banter API
+Autonomous — Banter API
 
 Endpoints:
   GET    /api/banter       — list banter messages (filterable by mission, agent, sender, type)

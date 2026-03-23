@@ -1,5 +1,5 @@
 """
-theHIVE — Missions API
+Autonomous — Missions API
 
 Endpoints:
   GET    /api/missions              — list all missions (filterable)

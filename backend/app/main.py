@@ -1,5 +1,5 @@
 """
-theHIVE — Application Entry Point
+Autonomous — Application Entry Point
 
 Assembles the FastAPI application with all routers, middleware, and
 startup/shutdown lifecycle hooks.
@@ -72,7 +72,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle hooks."""
-    logger.info("Starting theHIVE API v%s", APP_VERSION)
+    logger.info("Starting Autonomous API v%s", APP_VERSION)
     await init_db()
     logger.info("Database tables verified.")
     
@@ -89,7 +89,7 @@ async def lifespan(app: FastAPI):
     except asyncio.CancelledError:
         logger.info("Agent Brain background loop cancelled.")
     
-    logger.info("Shutting down theHIVE API.")
+    logger.info("Shutting down Autonomous API.")
 
 
 # ---------------------------------------------------------------------------

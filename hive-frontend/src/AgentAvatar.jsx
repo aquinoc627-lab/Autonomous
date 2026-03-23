@@ -1,5 +1,5 @@
 /**
- * theHIVE — Animated Agent Avatar
+ * Autonomous — Animated Agent Avatar
  *
  * A fully animated SVG-based avatar that visualizes each agent's:
  *   - Unique persona (color, icon, personality)

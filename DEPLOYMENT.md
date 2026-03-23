@@ -1,6 +1,6 @@
-# theHIVE — Production Deployment Guide
+# Autonomous — Production Deployment Guide
 
-This guide provides instructions for deploying the theHIVE in a production environment using Docker and Nginx.
+This guide provides instructions for deploying Autonomous in a production environment using Docker and Nginx.
 
 ## 1. Prerequisites
 - Docker and Docker Compose installed on the target server.
@@ -14,23 +14,23 @@ Create a `.env` file in the root directory (or copy `.env.example` and edit it):
 # Backend Configuration
 SECRET_KEY=your-production-secret-key-here
 CORS_ORIGINS=https://your-domain.com
-DATABASE_URL=postgresql+asyncpg://theHIVE_user:theHIVE_password@db:5432/theHIVE_db
+DATABASE_URL=postgresql+asyncpg://Autonomous_user:Autonomous_password@db:5432/Autonomous_db
 GEMINI_API_KEY=your-gemini-api-key-here
 
 # Frontend Configuration
 REACT_APP_API_URL=https://api.your-domain.com
 
 # Database Configuration
-POSTGRES_USER=theHIVE_user
-POSTGRES_PASSWORD=theHIVE_password
-POSTGRES_DB=theHIVE_db
+POSTGRES_USER=Autonomous_user
+POSTGRES_PASSWORD=Autonomous_password
+POSTGRES_DB=Autonomous_db
 ```
 
 ## 3. Deployment Steps
 1.  **Clone the Repository**:
     ```bash
-    git clone https://github.com/aquinoc627-lab/swarm-suite.git
-    cd swarm-suite
+    git clone https://github.com/aquinoc627-lab/autonomous.git
+    cd autonomous
     ```
 
 2.  **Build and Start the Containers**:

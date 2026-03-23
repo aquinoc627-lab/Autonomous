@@ -1,5 +1,5 @@
 """
-theHIVE — Memory Palace (Vector Database Service)
+Autonomous — Memory Palace (Vector Database Service)
 
 Provides long-term semantic memory for agents using ChromaDB and Gemini embeddings.
 Includes ingestion, storage, and retrieval of missions, banter, and code.

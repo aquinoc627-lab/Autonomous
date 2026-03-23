@@ -1,5 +1,5 @@
 """
-theHIVE — AgentMission Junction Table
+Autonomous — AgentMission Junction Table
 
 Implements the many-to-many relationship between Agents and Missions.
 Each row records which agent is assigned to which mission, when the

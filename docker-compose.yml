@@ -1,4 +1,4 @@
-# theHIVE — Docker Compose Configuration
+# Autonomous — Docker Compose Configuration
 # Orchestrates the entire stack: Backend, Frontend, and PostgreSQL
 
 version: '3.8'
@@ -9,10 +9,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: theHIVE-backend
+    container_name: autonomous-backend
     restart: always
     environment:
-      - DATABASE_URL=postgresql+asyncpg://theHIVE_user:theHIVE_password@db:5432/theHIVE_db
+      - DATABASE_URL=postgresql+asyncpg://autonomous_user:autonomous_password@db:5432/autonomous_db
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
       - AUTH_MODE=jwt
@@ -24,7 +24,7 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - theHIVE-network
+      - autonomous-network
 
   # Frontend Service (React + Nginx)
   frontend:
@@ -33,36 +33,36 @@ services:
       dockerfile: Dockerfile
       args:
         - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000}
-    container_name: theHIVE-frontend
+    container_name: autonomous-frontend
     restart: always
     depends_on:
       - backend
     ports:
       - "3000:80"
     networks:
-      - theHIVE-network
+      - autonomous-network
 
   # Database Service (PostgreSQL)
   db:
     image: postgres:15-alpine
-    container_name: theHIVE-db
+    container_name: autonomous-db
     restart: always
     environment:
-      - POSTGRES_USER=theHIVE_user
-      - POSTGRES_PASSWORD=theHIVE_password
-      - POSTGRES_DB=theHIVE_db
+      - POSTGRES_USER=autonomous_user
+      - POSTGRES_PASSWORD=autonomous_password
+      - POSTGRES_DB=autonomous_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U theHIVE_user -d theHIVE_db"]
+      test: ["CMD-SHELL", "pg_isready -U autonomous_user -d autonomous_db"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - theHIVE-network
+      - autonomous-network
 
 networks:
-  theHIVE-network:
+  autonomous-network:
     driver: bridge
 
 volumes:

@@ -1,2 +1,2 @@
-# theHIVE Platform Deployment Guide (Kali Linux WSL)
+# Autonomous Platform Deployment Guide (Kali Linux WSL)
 ...

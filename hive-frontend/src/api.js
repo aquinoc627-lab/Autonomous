@@ -1,5 +1,5 @@
 /**
- * theHIVE — API Client
+ * Autonomous — API Client
  *
  * Centralised Axios instance with JWT interceptors for automatic
  * token attachment and 401 handling.

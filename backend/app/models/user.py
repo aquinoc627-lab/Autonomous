@@ -1,5 +1,5 @@
 """
-theHIVE — User Model
+Autonomous — User Model
 
 Represents an authenticated user of the platform.  Each user has a role
 (``admin`` or ``operator``) that governs access to privileged endpoints.

@@ -1,4 +1,4 @@
-# theHIVE — Backend Dependencies
+# Autonomous — Backend Dependencies
 
 # ── Core Framework ──────────────────────────────────────────────
 fastapi>=0.110.0

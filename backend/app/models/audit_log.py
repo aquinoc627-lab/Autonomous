@@ -1,5 +1,5 @@
 """
-theHIVE — AuditLog Model
+Autonomous — AuditLog Model
 
 Immutable append-only log of security-relevant actions performed on the
 platform.  Every mutation (create, update, delete) and authentication

@@ -1,4 +1,4 @@
-# theHIVE — Frontend Dockerfile
+# Autonomous — Frontend Dockerfile
 # Optimized for production with React and Nginx
 
 # Build stage

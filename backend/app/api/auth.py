@@ -1,5 +1,5 @@
 """
-theHIVE — Authentication API
+Autonomous — Authentication API
 
 Endpoints:
   POST /api/auth/register  — create a new user (admin only)

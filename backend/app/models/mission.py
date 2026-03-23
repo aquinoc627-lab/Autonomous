@@ -1,5 +1,5 @@
 """
-theHIVE — Mission Model
+Autonomous — Mission Model
 
 Represents a task or objective within the platform.  Missions progress
 through a defined status lifecycle and can be assigned to multiple agents.

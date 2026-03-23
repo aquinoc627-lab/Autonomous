@@ -174,7 +174,7 @@ export function parseVoiceCommand(transcript) {
   }
 
   if (lower.includes("show") || lower.includes("go to")) {
-    const pages = ["missions", "agents", "banter", "analytics", "theHIVE"];
+    const pages = ["missions", "agents", "banter", "analytics", "autonomous"];
     for (const page of pages) {
       if (lower.includes(page)) {
         return { type: "navigate", page };

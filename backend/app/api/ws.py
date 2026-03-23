@@ -1,5 +1,5 @@
 """
-theHIVE — WebSocket Endpoint
+Autonomous — WebSocket Endpoint
 
 Provides a single authenticated WebSocket endpoint that supports:
   - Global broadcast subscription (automatic on connect)

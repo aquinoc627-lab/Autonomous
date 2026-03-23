@@ -1,5 +1,5 @@
 """
-theHIVE — Agents API
+Autonomous — Agents API
 
 Endpoints:
   GET    /api/agents          — list all agents (filterable by status)

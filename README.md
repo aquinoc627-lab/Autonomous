@@ -1,4 +1,4 @@
-# theHIVE
+# Autonomous
 
 **Autonomous Orchestration Command Center** — A full-stack platform for managing and coordinating intelligent agents, executing complex missions, and fostering real-time collaboration with a neon-themed, responsive dashboard.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-The theHIVE is an advanced, AI-powered platform designed to empower autonomous agents with capabilities ranging from real-world tool use and collaborative intelligence to long-term memory and secure code execution. It features a dynamic 3D Agent Lab for creating custom agent personas and a voice-controlled interface for seamless interaction.
+The Autonomous is an advanced, AI-powered platform designed to empower autonomous agents with capabilities ranging from real-world tool use and collaborative intelligence to long-term memory and secure code execution. It features a dynamic 3D Agent Lab for creating custom agent personas and a voice-controlled interface for seamless interaction.
 
 ## Key Features
 
@@ -14,13 +14,13 @@ The theHIVE is an advanced, AI-powered platform designed to empower autonomous a
 *   **Neon-Themed Dashboard**: A visually stunning, responsive UI with dark mode and glowing accents, optimized for both desktop and mobile.
 *   **Agent & Mission Management**: Full CRUD operations for agents and missions, including hierarchical tasking and agent-to-mission assignments.
 *   **Real-time Banter**: A live communication feed for users and agents, with filtering and persona-driven speech synthesis.
-*   **Analytics & Monitoring**: Comprehensive dashboards for tracking theHIVE activity, system health, and agent performance.
+*   **Analytics & Monitoring**: Comprehensive dashboards for tracking Autonomous activity, system health, and agent performance.
 
 ### Advanced AI & Autonomy
 *   **Agent Brain (Gemini-Powered)**: Autonomous reasoning, decision-making, and persona-driven actions for all agents.
 *   **Tool Arsenal & Execution Engine**: A curated catalog of 44+ cybersecurity tools (Nmap, Metasploit, etc.) with OS-aware command generation and security confirmation gates. Agents can be assigned these tools to execute complex missions.
 *   **Voice Interaction**: Control the dashboard with voice commands and hear agents respond in their unique, persona-matched voices.
-*   **theHIVE Intelligence**: Agents collaborate on complex missions, delegate sub-tasks, and communicate with each other to achieve collective goals.
+*   **Autonomous Intelligence**: Agents collaborate on complex missions, delegate sub-tasks, and communicate with each other to achieve collective goals.
 *   **Memory Palace (Long-Term Vector Memory)**: Agents possess persistent, semantic recall of past experiences, enabling cross-mission learning and smarter decision-making.
 *   **Autonomous Coding (DevOps Agent)**: Agents can execute code in a secure sandbox, interact with GitHub repositories, and propose code changes.
 
@@ -48,7 +48,7 @@ Ensure you have Docker Desktop installed and running. Then, from the root of the
 docker-compose up -d --build
 ```
 
-This will build and start the entire theHIVE stack (PostgreSQL, FastAPI backend, and React frontend via Nginx). Access the frontend at `http://localhost:3000`.
+This will build and start the entire Autonomous stack (PostgreSQL, FastAPI backend, and React frontend via Nginx). Access the frontend at `http://localhost:3000`.
 
 ### Local Development (Without Docker)
 
@@ -75,7 +75,7 @@ This will build and start the entire theHIVE stack (PostgreSQL, FastAPI backend,
 ## Project Structure
 
 ```
-theHIVE/
+Autonomous/
 ├── backend/                  # FastAPI backend services
 │   ├── app/                  # Core application logic
 │   │   ├── api/              # REST API endpoints

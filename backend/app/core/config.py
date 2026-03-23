@@ -1,5 +1,5 @@
 """
-theHIVE — Application Configuration
+Autonomous — Application Configuration
 
 Centralised settings loaded from environment variables with sensible defaults
 for local development.  Switch from SQLite to PostgreSQL by setting the
@@ -28,7 +28,7 @@ DATA_DIR.mkdir(exist_ok=True)
 # Production: set DATABASE_URL=postgresql+asyncpg://user:pass@host/dbname
 DATABASE_URL: str = os.getenv(
     "DATABASE_URL",
-    f"sqlite+aiosqlite:///{DATA_DIR / 'theHIVE_suite.db'}",
+    f"sqlite+aiosqlite:///{DATA_DIR / 'autonomous_suite.db'}",
 )
 
 # Echo SQL statements to stdout (useful for debugging, disable in production)
@@ -72,6 +72,6 @@ CORS_ORIGINS: list[str] = os.getenv(
 # ---------------------------------------------------------------------------
 # Application metadata
 # ---------------------------------------------------------------------------
-APP_TITLE: str = "theHIVE API"
+APP_TITLE: str = "Autonomous API"
 APP_VERSION: str = "0.1.0"
 APP_DESCRIPTION: str = "Orchestration platform for managing agents, missions, and real-time banter."

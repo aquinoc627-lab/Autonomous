@@ -1,5 +1,5 @@
 """
-theHIVE — Playbooks API
+Autonomous — Playbooks API
 ========================
 Pre-built autonomous attack-chain workflows (playbooks) that orchestrate
 multiple tools in sequence with intelligent confirmation gates.

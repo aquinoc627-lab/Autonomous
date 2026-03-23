@@ -26,8 +26,8 @@ const WELCOME_BANNER = [
   "  ║       ██║   ██║  ██║███████╗██║  ██║██║ ╚████╔╝ ███████╗║",
   "  ║       ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚══════╝║",
   "  ║                                                          ║",
-  "  ║          Autonomous Swarm Intelligence Terminal           ║",
-  "  ║                     v2.0 — theHIVE                       ║",
+  "  ║             Autonomous Intelligence Terminal             ║",
+  "  ║                    v2.0 — Autonomous                     ║",
   "  ╚══════════════════════════════════════════════════════════╝",
   "",
   "  Type 'help' for available commands. Type 'tools' to list arsenal.",
@@ -365,7 +365,7 @@ export default function Terminal() {
             <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#28c840" }} />
           </div>
           <span style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-            theHIVE Terminal — {user?.username || "operator"}@hive
+            Autonomous Terminal — {user?.username || "operator"}@hive
           </span>
           <div style={{ display: "flex", gap: 8, fontSize: 11, color: "var(--text-muted)" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>

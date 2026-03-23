@@ -1,5 +1,5 @@
 """
-theHIVE — OAuth Authentication Module
+Autonomous — OAuth Authentication Module
 
 Provides an alternative authentication backend using external OAuth providers
 (Auth0, Okta, or any OIDC-compliant provider).  When AUTH_MODE=oauth, this
@@ -26,7 +26,7 @@ Usage:
     AUTH_MODE=oauth
     OAUTH_DOMAIN=your-tenant.auth0.com
     OAUTH_CLIENT_ID=your-client-id
-    OAUTH_AUDIENCE=https://api.theHIVE-suite.com
+    OAUTH_AUDIENCE=https://api.autonomous.local
 """
 
 from __future__ import annotations
@@ -140,8 +140,8 @@ def _extract_role(payload: dict[str, Any]) -> str:
     Extract the user role from OAuth token claims.
 
     Supports common claim patterns:
-      - Auth0 custom namespace: ``https://theHIVE-suite.com/role``
-      - Auth0 roles array: ``https://theHIVE-suite.com/roles``
+      - Auth0 custom namespace: ``https://autonomous.local/role``
+      - Auth0 roles array: ``https://autonomous.local/roles``
       - Okta groups claim: ``groups``
       - Standard ``role`` claim
     """

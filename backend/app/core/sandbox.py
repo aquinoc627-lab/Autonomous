@@ -1,5 +1,5 @@
 """
-theHIVE — Secure Code Execution Sandbox
+Autonomous — Secure Code Execution Sandbox
 
 Provides a restricted environment for agents to execute Python code and shell commands.
 Includes resource limits, input sanitization, and audit logging.

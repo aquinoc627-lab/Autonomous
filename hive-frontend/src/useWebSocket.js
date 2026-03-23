@@ -1,5 +1,5 @@
 /**
- * theHIVE — WebSocket Hook
+ * Autonomous — WebSocket Hook
  *
  * Provides a reusable hook for connecting to the backend WebSocket,
  * subscribing to channels, and receiving real-time events.

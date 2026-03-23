@@ -40,7 +40,7 @@ export default function VoiceControl() {
             break;
 
           case "navigate":
-            navigate(`/${command.page === "theHIVE" ? "" : command.page}`);
+            navigate(`/${command.page === "autonomous" ? "" : command.page}`);
             speak(`Navigating to ${command.page}`);
             addToast({
               type: "info",
