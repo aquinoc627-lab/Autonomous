@@ -23,6 +23,11 @@ services:
         condition: service_healthy
     ports:
       - "8000:8000"
+    volumes:
+      # NOTE: Mounting the Docker socket grants the backend container full control
+      # over the host Docker daemon (required for Ghost Protocol lab management).
+      # Ensure the backend service is properly hardened in production deployments.
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - autonomous-network
 

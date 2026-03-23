@@ -149,4 +149,10 @@ export const playbooksAPI = {
     api.post(`/api/playbooks/executions/${execId}/step`, { action }),
 };
 
+// ── Ghost Protocol ───────────────────────────────────────────
+export const ghostAPI = {
+  status: () => api.get("/api/ghost/status"),
+  toggle: (enable) => api.post(`/api/ghost/toggle?enable=${enable}`),
+};
+
 export default api;
