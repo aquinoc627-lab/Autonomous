@@ -1,0 +1,170 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #050608;
+    color: #e0e6ed;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: #0a0c10;
+    border-right: 1px solid #2a2e3f;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.brand {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #2a2e3f;
+    margin-bottom: 20px;
+}
+
+.brand h2 {
+    color: #00f0ff;
+    font-size: 1.1rem;
+    letter-spacing: 4px;
+}
+
+.brand .version {
+    color: #555;
+    font-size: 0.7rem;
+}
+
+.nav-links {
+    list-style: none;
+    flex: 1;
+}
+
+.nav-links li {
+    padding: 12px 20px;
+    cursor: pointer;
+    color: #888;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-links li:hover {
+    color: #00f0ff;
+    background: rgba(0, 240, 255, 0.05);
+    border-left-color: rgba(0, 240, 255, 0.4);
+}
+
+.nav-links li.active {
+    color: #00f0ff;
+    background: rgba(0, 240, 255, 0.08);
+    border-left-color: #00f0ff;
+}
+
+/* ── Main Content ── */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px;
+    border-bottom: 1px solid #2a2e3f;
+    background: #0a0c10;
+}
+
+header h1 {
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: #e0e6ed;
+}
+
+/* ── Status Badge ── */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.status-badge.online {
+    background: rgba(0, 255, 102, 0.1);
+    color: #00ff66;
+    border: 1px solid #00ff66;
+}
+
+.status-badge.offline {
+    background: rgba(255, 0, 60, 0.1);
+    color: #ff003c;
+    border: 1px solid #ff003c;
+}
+
+/* ── Content Panels ── */
+.content-panel {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.content-panel h3 {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: #00f0ff;
+    margin-bottom: 10px;
+}
+
+.content-panel p {
+    color: #888;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+/* ── Console Output ── */
+.console-output {
+    margin-top: 20px;
+    background: #0a0c10;
+    border: 1px solid #2a2e3f;
+    border-radius: 5px;
+    padding: 15px;
+    font-size: 0.78rem;
+    color: #00ff66;
+    line-height: 1.8;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* ── Search Boxes ── */
+.search-box input[type="text"],
+.search-box input[type="email"],
+.search-box input[type="password"],
+.search-box input[type="file"] {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+}
+
+.search-box button {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    transition: background 0.2s ease;
+}
+
+.search-box button:hover {
+    background: rgba(0, 240, 255, 0.2) !important;
+}
