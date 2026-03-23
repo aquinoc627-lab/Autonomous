@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous | Cyber Suite</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="brand">
+                <h2>AUTONOMOUS</h2>
+                <span class="version">v1.0.0</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="dashboard">Dashboard Overview</li>
+                <li data-target="osint">OSINT Tools</li>
+                <li data-target="forensics">Image Forensics</li>
+                <li data-target="breach">Breach Intel</li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header>
+                <h1>Dashboard Overview</h1>
+                <div id="api-status" class="status-badge offline">API Offline</div>
+            </header>
+            
+            <div id="content-area" class="content-panel">
+                <h3>Welcome to the Autonomous Cyber Suite</h3>
+                <p>Select a module from the sidebar to begin analysis.</p>
+                <div class="console-output" id="console">
+                    > System initializing...
+                </div>
+            </div>
+
+            <!-- New OSINT Panel -->
+            <div id="osint-panel" class="content-panel" style="display: none;">
+                <h3>Username Tracking (Sherlock)</h3>
+                <p>Deploy Sherlock to hunt down a username across 300+ platforms.</p>
+                
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="target-username" placeholder="Enter target username..." 
+                           style="padding: 10px; width: 300px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-sherlock-btn" 
+                            style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">
+                        Initiate Hunt
+                    </button>
+                </div>
+                
+                <!-- Results Table -->
+                <div id="osint-results" style="margin-top: 20px;">
+                    <!-- Discovered profiles will populate here -->
+                </div>
+            </div>
+
+            <!-- New Breach Panel -->
+            <div id="breach-panel" class="content-panel" style="display: none;">
+                <h3>Breach &amp; Credential Intelligence</h3>
+                <p>Query HaveIBeenPwned to discover if an email has been compromised in known data breaches.</p>
+                
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="email" id="target-email" placeholder="Enter target email..." 
+                           style="padding: 10px; width: 250px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <input type="password" id="hibp-api-key" placeholder="HIBP API Key..." 
+                           style="padding: 10px; width: 200px; background: #050608; color: #00ff66; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-breach-btn" 
+                            style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">
+                        Check Breaches
+                    </button>
+                </div>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">* HaveIBeenPwned requires an API key. Get one at haveibeenpwned.com/API/Key</p>
+                
+                <!-- Results Table -->
+                <div id="breach-results" style="margin-top: 20px;">
+                    <!-- Breach data will populate here -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
