@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous | Cyber Suite</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="brand">
+                <h2>AUTONOMOUS</h2>
+                <span class="version">v1.0.0</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="dashboard">Dashboard Overview</li>
+                <li data-target="osint">OSINT Tools</li>
+                <li data-target="forensics">Image Forensics</li>
+                <li data-target="breach">Breach Intel</li>
+                <li data-target="infrastructure">Attack Surface (Shodan)</li>
+                <li data-target="archive">Web Archiving</li>
+                <li data-target="vulnerability">Vuln Validation</li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header>
+                <h1>Dashboard Overview</h1>
+                <div id="api-status" class="status-badge offline">API Offline</div>
+            </header>
+            
+            <div id="content-area" class="content-panel">
+                <h3>Welcome to the Autonomous Cyber Suite</h3>
+                <p>Select a module from the sidebar to begin analysis.</p>
+                <div class="console-output" id="console">
+                    > System initializing...
+                </div>
+            </div>
+
+            <div id="osint-panel" class="content-panel" style="display: none;">
+                <h3>Username Tracking (Sherlock)</h3>
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="target-username" placeholder="Enter target username..." style="padding: 10px; width: 300px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-sherlock-btn" style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">Initiate Hunt</button>
+                </div>
+                <div id="osint-results" style="margin-top: 20px;"></div>
+            </div>
+
+            <div id="breach-panel" class="content-panel" style="display: none;">
+                <h3>Breach &amp; Credential Intelligence</h3>
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="email" id="target-email" placeholder="Enter target email..." style="padding: 10px; width: 250px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <input type="password" id="hibp-api-key" placeholder="HIBP API Key..." style="padding: 10px; width: 200px; background: #050608; color: #00ff66; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-breach-btn" style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">Check Breaches</button>
+                </div>
+                <div id="breach-results" style="margin-top: 20px;"></div>
+            </div>
+
+            <div id="forensics-panel" class="content-panel" style="display: none;">
+                <h3>Image Forensics &amp; GEOINT</h3>
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+                    <input type="file" id="image-upload" accept="image/jpeg, image/png" style="padding: 10px; background: #050608; color: #e0e6ed; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-forensics-btn" style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">Extract Data</button>
+                </div>
+                <div id="map" style="height: 300px; width: 100%; display: none; margin-top: 20px; border: 1px solid #2a2e3f; border-radius: 5px;"></div>
+                <div id="forensics-results" style="margin-top: 20px;"></div>
+            </div>
+
+            <div id="infrastructure-panel" class="content-panel" style="display: none;">
+                <h3>Infrastructure &amp; Attack Surface Mapping</h3>
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="target-infra" placeholder="Enter Domain or IP" style="padding: 10px; width: 250px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <input type="password" id="shodan-api-key" placeholder="Shodan API Key..." style="padding: 10px; width: 200px; background: #050608; color: #00ff66; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-infra-btn" style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">Map Surface</button>
+                </div>
+                <div id="infra-results" style="margin-top: 20px;"></div>
+            </div>
+
+            <div id="archive-panel" class="content-panel" style="display: none;">
+                <h3>Web Archiving &amp; Discovery</h3>
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="target-archive" placeholder="Enter domain (e.g. example.com)..." style="padding: 10px; width: 300px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-archive-btn" style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">Discover Endpoints</button>
+                </div>
+                <div id="archive-results" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- New Vulnerability Panel -->
+            <div id="vulnerability-panel" class="content-panel" style="display: none;">
+                <h3>Vulnerability Validation (Passive)</h3>
+                <p>Scan a web target for security misconfigurations, missing headers, and exposed sensitive files.</p>
+                
+                <div class="search-box" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="target-vuln" placeholder="Enter target URL (e.g. https://example.com)..." 
+                           style="padding: 10px; width: 300px; background: #050608; color: #00f0ff; border: 1px solid #2a2e3f; border-radius: 4px;">
+                    <button id="run-vuln-btn" 
+                            style="padding: 10px 20px; background: rgba(0, 240, 255, 0.1); color: #00f0ff; border: 1px solid #00f0ff; border-radius: 4px; cursor: pointer;">
+                        Run Scan
+                    </button>
+                </div>
+                
+                <div id="vuln-results" style="margin-top: 20px;"></div>
+            </div>
+
+        </main>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>
