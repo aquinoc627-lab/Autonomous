@@ -102,7 +102,7 @@ Autonomous runs as two separate processes: the FastAPI backend and the React fro
 1. Open a **new** Kali terminal tab (or run in the same terminal).
 2. Navigate to the frontend directory:
    ```bash
-   cd ~/autonomous/hive-frontend
+   cd ~/autonomous/autonomous-frontend
    ```
 3. Install Node dependencies:
    ```bash

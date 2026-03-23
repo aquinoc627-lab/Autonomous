@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { agentsAPI, missionsAPI } from "./api";
 import { AgentAvatarInline } from "./AgentAvatar";
 
-export default function HiveGraph() {
+export default function AutonomousGraph() {
   const { data: agents } = useQuery({
     queryKey: ["agents-list"],
     queryFn: () => agentsAPI.list().then((r) => r.data),

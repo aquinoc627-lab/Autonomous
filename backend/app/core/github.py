@@ -1,5 +1,5 @@
 """
-theHIVE — GitHub API Integration
+Autonomous — GitHub API Integration
 
 Provides a bridge for agents to interact with GitHub repositories.
 Includes repository analysis, file fetching, and Pull Request generation.
