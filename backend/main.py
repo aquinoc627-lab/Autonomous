@@ -183,12 +183,20 @@ async def validate_target(target_url: str):
     if not target_url.startswith(("http://", "https://")):
         target_url = "http://" + target_url
 
-    # Resolve the hostname and block requests to private/loopback addresses (SSRF prevention)
+    # Parse and validate the target URL before making any requests (SSRF prevention)
     parsed = urlparse(target_url)
     hostname = parsed.hostname or ""
+    if not hostname:
+        return {"status": "error", "message": "Invalid target URL: missing hostname."}
+
+    # Only allow http/https schemes
+    if parsed.scheme not in ("http", "https"):
+        return {"status": "error", "message": "Only http and https URLs are supported."}
+
+    # Resolve the hostname and block requests to private/loopback addresses
+    import ipaddress
     try:
         resolved_ip = socket.gethostbyname(hostname)
-        import ipaddress
         ip_obj = ipaddress.ip_address(resolved_ip)
         if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved:
             return {"status": "error", "message": "Scanning private or internal IP addresses is not permitted."}
@@ -197,8 +205,14 @@ async def validate_target(target_url: str):
     except ValueError:
         return {"status": "error", "message": "Invalid target URL."}
 
+    # Build a sanitized URL from only the validated components
+    safe_netloc = parsed.netloc
+    safe_path = parsed.path or "/"
+    safe_url = f"{parsed.scheme}://{safe_netloc}{safe_path}"
+    base_url = f"{parsed.scheme}://{safe_netloc}"
+
     results = {
-        "target": target_url,
+        "target": safe_url,
         "server_info": "Unknown",
         "missing_headers": [],
         "present_headers": {},
@@ -206,7 +220,7 @@ async def validate_target(target_url: str):
     }
     
     try:
-        resp = requests.get(target_url, timeout=5, verify=False)
+        resp = requests.get(safe_url, timeout=5, verify=False)
         lower_headers = {k.lower(): v for k, v in resp.headers.items()}
         
         results["server_info"] = resp.headers.get("Server", "Unknown")
@@ -226,7 +240,6 @@ async def validate_target(target_url: str):
                 results["present_headers"][header] = lower_headers[header]
 
         files_to_check = ["/robots.txt", "/sitemap.xml", "/.git/HEAD", "/.env", "/.DS_Store"]
-        base_url = f"{parsed.scheme}://{parsed.netloc}"
         
         for f in files_to_check:
             try:
