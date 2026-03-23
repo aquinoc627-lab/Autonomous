@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous | Cyber Suite</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="brand">
+                <h2>AUTONOMOUS</h2>
+                <span class="version">v1.0.0</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="dashboard">Dashboard Overview</li>
+                <li data-target="osint">OSINT Tools</li>
+                <li data-target="forensics">Image Forensics</li>
+                <li data-target="breach">Breach Intel</li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header>
+                <h1>Dashboard Overview</h1>
+                <div id="api-status" class="status-badge offline">API Offline</div>
+            </header>
+            
+            <div id="content-area" class="content-panel">
+                <h3>Welcome to the Autonomous Cyber Suite</h3>
+                <p>Select a module from the sidebar to begin analysis.</p>
+                <div class="console-output" id="console">
+                    > System initializing...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
