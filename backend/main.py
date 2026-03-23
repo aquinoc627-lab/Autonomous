@@ -182,7 +182,21 @@ async def web_archive_discovery(domain: str, limit: int = 100):
 async def validate_target(target_url: str):
     if not target_url.startswith(("http://", "https://")):
         target_url = "http://" + target_url
-        
+
+    # Resolve the hostname and block requests to private/loopback addresses (SSRF prevention)
+    parsed = urlparse(target_url)
+    hostname = parsed.hostname or ""
+    try:
+        resolved_ip = socket.gethostbyname(hostname)
+        import ipaddress
+        ip_obj = ipaddress.ip_address(resolved_ip)
+        if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved:
+            return {"status": "error", "message": "Scanning private or internal IP addresses is not permitted."}
+    except socket.gaierror:
+        return {"status": "error", "message": f"Could not resolve host: {hostname}"}
+    except ValueError:
+        return {"status": "error", "message": "Invalid target URL."}
+
     results = {
         "target": target_url,
         "server_info": "Unknown",
@@ -212,8 +226,7 @@ async def validate_target(target_url: str):
                 results["present_headers"][header] = lower_headers[header]
 
         files_to_check = ["/robots.txt", "/sitemap.xml", "/.git/HEAD", "/.env", "/.DS_Store"]
-        parsed_url = urlparse(target_url)
-        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
         
         for f in files_to_check:
             try:
