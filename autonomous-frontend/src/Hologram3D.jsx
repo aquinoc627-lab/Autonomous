@@ -78,12 +78,17 @@ extend({ HologramMaterial });
 function getPersonaType(agent) {
   const p = agent?.persona?.personality?.toLowerCase() || "";
   if (p.includes("stealth")) return "stealth";
-  if (p.includes("analytical") || p.includes("analyti")) return "analytical";
+  if (p.includes("analytical")) return "analytical";
   if (p.includes("commander") || p.includes("strategic")) return "commander";
   if (p.includes("observer") || p.includes("observant")) return "observer";
   if (p.includes("aggressive")) return "aggressive";
   return "default";
 }
+
+// ── Glitch intensity constants ───────────────────────────────────────────────
+const GLITCH_INTENSITY_NORMAL = 0.08;
+const GLITCH_INTENSITY_OFFLINE = 0.4;
+const GLITCH_INTENSITY_PROCESSING = 0.25;
 
 // ── Floating Holographic UI Panel ────────────────────────────────────────────
 function HologramPanel({ position, color, label, orbitRadius, orbitSpeed, orbitOffset }) {
@@ -335,8 +340,7 @@ function HologramCharacter({
 
   // Shared uniform updater
   const updateMaterials = (time, volume) => {
-    materialRefs.current.forEach((mat) => {
-      if (!mat) return;
+    materialRefs.current.filter(Boolean).forEach((mat) => {
       mat.time = time;
       mat.voiceVolume = volume;
     });
@@ -368,9 +372,9 @@ function HologramCharacter({
     if (animationState === "offline") {
       groupRef.current.scale.x = 1 + Math.sin(time * 12) * 0.025;
       groupRef.current.scale.z = 1 + Math.cos(time * 12) * 0.025;
-      materialRefs.current.forEach((mat) => { if (mat) mat.glitchIntensity = 0.4; });
+      materialRefs.current.filter(Boolean).forEach((mat) => { mat.glitchIntensity = GLITCH_INTENSITY_OFFLINE; });
     } else {
-      materialRefs.current.forEach((mat) => { if (mat) mat.glitchIntensity = 0.08; });
+      materialRefs.current.filter(Boolean).forEach((mat) => { mat.glitchIntensity = GLITCH_INTENSITY_NORMAL; });
     }
 
     // Waving gesture — right arm waves
@@ -392,7 +396,7 @@ function HologramCharacter({
 
     // Processing — extra glitch
     if (animationState === "processing") {
-      materialRefs.current.forEach((mat) => { if (mat) mat.glitchIntensity = 0.25; });
+      materialRefs.current.filter(Boolean).forEach((mat) => { mat.glitchIntensity = GLITCH_INTENSITY_PROCESSING; });
     }
 
     updateMaterials(time, voiceVolume);

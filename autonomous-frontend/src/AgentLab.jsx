@@ -38,6 +38,9 @@ const PERSONA_PRESETS = {
   },
 };
 
+// Animation states supported by HologramCharacter and their visual effects:
+// idle=breathing, speaking=bounce+headtilt, thinking=spin+panels, waving=arm wave,
+// pointing=arm extend, processing=sparkles+glitch, offline=glitch+flicker
 const ANIMATION_STATES = ["idle", "speaking", "thinking", "waving", "pointing", "processing", "offline"];
 const VOICE_STYLES = ["neutral", "assertive", "calm", "urgent"];
 const ICONS = ["brain", "shield", "eye", "bolt", "crosshair", "satellite"];

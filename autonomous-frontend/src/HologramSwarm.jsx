@@ -218,44 +218,42 @@ function SwarmAgentNode({ agent, position, isSelected, onClick, speakingIds }) {
   );
 }
 
+// ── Persona type helpers ──────────────────────────────────────────────────────
+function isCommanderPersona(agent) {
+  const p = agent?.persona?.personality?.toLowerCase() || "";
+  return p.includes("commander") || p.includes("strategic");
+}
+
+function isObserverPersona(agent) {
+  const p = agent?.persona?.personality?.toLowerCase() || "";
+  return p.includes("observer") || p.includes("observant");
+}
+
+function circularPosition(index, total, radius) {
+  const angle = (index / Math.max(total, 1)) * Math.PI * 2;
+  return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
+}
+
 // ── Formation layout ──────────────────────────────────────────────────────────
 function getSwarmPosition(agent, index, total, allAgents) {
-  const p = agent?.persona?.personality?.toLowerCase() || "";
-  const isCommander = p.includes("commander") || p.includes("strategic");
-  const isObserver = p.includes("observer") || p.includes("observant");
-
-  if (isCommander) {
+  if (isCommanderPersona(agent)) {
     // Commanders in the center, slightly elevated
-    const cmdAgents = allAgents.filter((a) => {
-      const ap = a?.persona?.personality?.toLowerCase() || "";
-      return ap.includes("commander") || ap.includes("strategic");
-    });
+    const cmdAgents = allAgents.filter(isCommanderPersona);
     const cmdIdx = cmdAgents.findIndex((a) => a.id === agent.id);
     return [cmdIdx * 1.5 - ((cmdAgents.length - 1) * 0.75), 0.5, 0];
   }
 
-  if (isObserver) {
+  if (isObserverPersona(agent)) {
     // Observers orbit the perimeter
-    const obsAgents = allAgents.filter((a) => {
-      const ap = a?.persona?.personality?.toLowerCase() || "";
-      return ap.includes("observer") || ap.includes("observant");
-    });
+    const obsAgents = allAgents.filter(isObserverPersona);
     const obsIdx = obsAgents.findIndex((a) => a.id === agent.id);
-    const angle = (obsIdx / Math.max(obsAgents.length, 1)) * Math.PI * 2;
-    const radius = 4.5;
-    return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
+    return circularPosition(obsIdx, obsAgents.length, 4.5);
   }
 
   // Other agents arranged in a middle ring
-  const otherAgents = allAgents.filter((a) => {
-    const ap = a?.persona?.personality?.toLowerCase() || "";
-    return !ap.includes("commander") && !ap.includes("strategic") &&
-           !ap.includes("observer") && !ap.includes("observant");
-  });
+  const otherAgents = allAgents.filter((a) => !isCommanderPersona(a) && !isObserverPersona(a));
   const othIdx = otherAgents.findIndex((a) => a.id === agent.id);
-  const angle = (othIdx / Math.max(otherAgents.length, 1)) * Math.PI * 2;
-  const radius = 2.8;
-  return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
+  return circularPosition(othIdx, otherAgents.length, 2.8);
 }
 
 // ── War Room Floor Grid ───────────────────────────────────────────────────────
@@ -290,16 +288,11 @@ function WarRoomScene({ agents, selectedId, onSelect, speakingIds, showDataStrea
     const result = [];
     const cmdIndices = agents
       .map((a, i) => ({ a, i }))
-      .filter(({ a }) => {
-        const p = a?.persona?.personality?.toLowerCase() || "";
-        return p.includes("commander") || p.includes("strategic");
-      })
+      .filter(({ a }) => isCommanderPersona(a))
       .map(({ i }) => i);
 
     agents.forEach((agent, i) => {
-      const p = agent?.persona?.personality?.toLowerCase() || "";
-      const isCmd = p.includes("commander") || p.includes("strategic");
-      if (!isCmd && cmdIndices.length > 0) {
+      if (!isCommanderPersona(agent) && cmdIndices.length > 0) {
         // Connect each non-commander to the nearest commander
         const nearestCmd = cmdIndices[i % cmdIndices.length];
         result.push({ from: i, to: nearestCmd, color: agent?.persona?.avatar_color || "#00f0ff" });
