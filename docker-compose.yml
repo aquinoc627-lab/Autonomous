@@ -29,7 +29,7 @@ services:
   # Frontend Service (React + Nginx)
   frontend:
     build:
-      context: ./hive-frontend
+      context: ./autonomous-frontend
       dockerfile: Dockerfile
       args:
         - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000}

@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from "./AuthContext";
 import { ToastProvider } from "./ToastContext";
 import Layout from "./Layout";
 import Login from "./Login";
-import HiveView from "./AutonomousView";
+import AutonomousView from "./AutonomousView";
 import Missions from "./Missions";
 import Agents from "./Agents";
 import Banter from "./Banter";
@@ -62,7 +62,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<HiveView />} />
+        <Route index element={<AutonomousView />} />
         <Route path="missions" element={<Missions />} />
         <Route path="agents" element={<Agents />} />
         <Route path="lab" element={<AgentLab />} />

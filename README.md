@@ -53,7 +53,7 @@ This will build and start the entire Autonomous stack (PostgreSQL, FastAPI backe
 ### Local Development (Without Docker)
 
 1.  **Backend (FastAPI)**: Navigate to the `backend/` directory, install `requirements.txt`, set environment variables (including `GEMINI_API_KEY` and `GITHUB_TOKEN`), run migrations (`alembic upgrade head`), seed data (`python app/seed.py`), and start with `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`.
-2.  **Frontend (React)**: Navigate to the `hive-frontend/` directory, install dependencies (`npm install`), set `REACT_APP_API_URL=http://localhost:8000` in a `.env` file, and start with `npm start`.
+2.  **Frontend (React)**: Navigate to the `autonomous-frontend/` directory, install dependencies (`npm install`), set `REACT_APP_API_URL=http://localhost:8000` in a `.env` file, and start with `npm start`.
 
 ### Demo Credentials
 
@@ -87,7 +87,7 @@ Autonomous/
 │   ├── alembic/              # Database migrations
 │   ├── data/                 # SQLite database (dev) and ChromaDB (vector store)
 │   └── tests/                # Pytest unit and integration tests
-├── hive-frontend/              # React frontend application
+├── autonomous-frontend/              # React frontend application
 │   ├── public/               # Static assets
 │   ├── src/                  # React components, hooks, contexts
 │   │   ├── components/       # Reusable UI components

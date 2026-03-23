@@ -14,8 +14,8 @@ backend/data/
 # Node / Frontend
 node_modules/
 hive-frontend/node_modules/
-hive-frontend/build/
-hive-frontend/.env.local
+autonomous-frontend/build/
+autonomous-frontend/.env.local
 build/
 
 # IDE

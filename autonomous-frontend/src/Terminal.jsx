@@ -94,7 +94,7 @@ export default function Terminal() {
 
       setHistory((prev) => [...prev, trimmed]);
       setHistoryIdx(-1);
-      addLine(`  \x1b[36mhive@${user?.username || "operator"}\x1b[0m:\x1b[33m~\x1b[0m$ ${trimmed}`);
+      addLine(`  \x1b[36mautonomous@${user?.username || "operator"}\x1b[0m:\x1b[33m~\x1b[0m$ ${trimmed}`);
 
       const parts = trimmed.split(/\s+/);
       const command = parts[0].toLowerCase();
@@ -365,7 +365,7 @@ export default function Terminal() {
             <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#28c840" }} />
           </div>
           <span style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-            Autonomous Terminal — {user?.username || "operator"}@hive
+            Autonomous Terminal — {user?.username || "operator"}@autonomous
           </span>
           <div style={{ display: "flex", gap: 8, fontSize: 11, color: "var(--text-muted)" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -395,7 +395,7 @@ export default function Terminal() {
                 <span style={{ color: "#00f0ff" }}>{line}</span>
               ) : line.includes("⚠") || line.includes("CONFIRMATION") ? (
                 <span style={{ color: "#ffe600" }}>{line}</span>
-              ) : line.includes("$") && line.includes("hive@") ? (
+              ) : line.includes("$") && line.includes("autonomous@") ? (
                 <span>
                   <span style={{ color: "#00f0ff" }}>{line.split("$")[0]}$</span>
                   <span style={{ color: "#e0e0e0" }}>{line.split("$").slice(1).join("$")}</span>
@@ -413,7 +413,7 @@ export default function Terminal() {
           {/* Input Line */}
           <div style={{ display: "flex", alignItems: "center", marginTop: 4 }}>
             <span style={{ color: "#00f0ff", marginRight: 4 }}>
-              hive@{user?.username || "operator"}
+              autonomous@{user?.username || "operator"}
             </span>
             <span style={{ color: "#ffe600", marginRight: 4 }}>:</span>
             <span style={{ color: "#ffe600", marginRight: 8 }}>~$</span>

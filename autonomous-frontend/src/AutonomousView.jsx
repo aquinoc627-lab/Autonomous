@@ -4,7 +4,7 @@ import { analyticsAPI, agentsAPI, missionsAPI, banterAPI } from "./api";
 import { useWebSocket } from "./useWebSocket";
 import AgentAvatar from "./AgentAvatar";
 import { Hologram3DCanvas } from "./Hologram3D";
-import HiveGraph from "./AutonomousGraph";
+import AutonomousGraph from "./AutonomousGraph";
 import ARHologramViewer from "./Hologram3DXR";
 import {
   MdSmartToy,
@@ -16,7 +16,7 @@ import {
   MdViewInAr,
 } from "react-icons/md";
 
-export default function HiveView() {
+export default function AutonomousView() {
   const queryClient = useQueryClient();
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [activeTab, setActiveTab] = useState("grid"); // "grid" or "collaboration"
@@ -284,7 +284,7 @@ export default function HiveView() {
           </div>
         </>
       ) : (
-        <HiveGraph />
+        <AutonomousGraph />
       )}
 
       {/* AR Mode */}

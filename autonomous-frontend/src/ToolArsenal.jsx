@@ -515,7 +515,7 @@ export default function ToolArsenal() {
       if (data.command) {
         await navigator.clipboard.writeText(data.command);
         // Use a simple alert-style notification since we don't have addToast here
-        const event = new CustomEvent("hive-toast", {
+        const event = new CustomEvent("autonomous-toast", {
           detail: { message: `Quick Launch: ${tool.name} command copied!`, type: "success" },
         });
         window.dispatchEvent(event);

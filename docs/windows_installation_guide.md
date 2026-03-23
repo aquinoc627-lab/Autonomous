@@ -102,13 +102,13 @@ This method allows you to run the backend and frontend services independently fo
 1.  Open a **new** Command Prompt or PowerShell window.
 2.  Navigate to the frontend directory:
     ```bash
-    cd autonomous\hive-frontend
+    cd autonomous\autonomous-frontend
     ```
 3.  Install frontend dependencies:
     ```bash
     npm install
     ```
-4.  Set environment variables. Create a `.env` file in the `hive-frontend` directory with the following:
+4.  Set environment variables. Create a `.env` file in the `autonomous-frontend` directory with the following:
     ```ini
     REACT_APP_API_URL=http://localhost:8000
     ```

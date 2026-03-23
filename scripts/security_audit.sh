@@ -26,7 +26,7 @@ fi
 
 # 3. Frontend Dependency Audit
 echo -e "\n[3/4] Auditing Frontend Dependencies..."
-cd ../hive-frontend
+cd ../autonomous-frontend
 npm audit --audit-level=high
 
 # 4. Secret Scanning (Basic)
