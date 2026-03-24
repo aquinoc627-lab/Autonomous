@@ -152,6 +152,8 @@ export const playbooksAPI = {
 // ── OSINT ─────────────────────────────────────────────────────────
 export const osintAPI = {
   sherlock: (username) => api.get(`/api/osint/sherlock/${encodeURIComponent(username)}`),
+};
+
 // ── Ghost Protocol ───────────────────────────────────────────
 export const ghostAPI = {
   status: () => api.get("/api/ghost/status"),
