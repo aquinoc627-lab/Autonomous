@@ -1,3 +1,42 @@
+:root {
+    --bg-dark: #0f111a;
+    --bg-panel: #1a1c29;
+    --text-main: #e0e6ed;
+    --accent-blue: #00f0ff;
+    --accent-green: #00ff66;
+    --accent-red: #ff003c;
+    --border-color: #2a2e3f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; }
+
+.dashboard-container { display: flex; width: 100%; height: 100%; }
+
+.sidebar { width: 250px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+
+.brand { padding: 20px; border-bottom: 1px solid var(--border-color); text-align: center; }
+.brand h2 { color: var(--accent-blue); letter-spacing: 2px; font-size: 1.2rem; }
+.brand .version { font-size: 0.8rem; color: #888; }
+
+.nav-links { list-style: none; padding: 20px 0; }
+.nav-links li { padding: 15px 20px; cursor: pointer; transition: 0.3s; border-left: 3px solid transparent; }
+.nav-links li:hover { background-color: rgba(0, 240, 255, 0.1); color: var(--accent-blue); }
+.nav-links li.active { border-left-color: var(--accent-blue); background-color: rgba(0, 240, 255, 0.05); color: var(--accent-blue); }
+
+.main-content { flex: 1; padding: 30px; display: flex; flex-direction: column; }
+
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+h1 { font-weight: 300; letter-spacing: 1px; }
+
+.status-badge { padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
+.status-badge.online { background-color: rgba(0, 255, 102, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+.status-badge.offline { background-color: rgba(255, 0, 60, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+.content-panel { background-color: var(--bg-panel); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; }
+
+.console-output { background-color: #050608; padding: 15px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; margin-top: 20px; color: var(--accent-green); height: 200px; overflow-y: auto; border: 1px solid #333; }
 * {
     margin: 0;
     padding: 0;

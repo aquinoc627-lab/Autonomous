@@ -15,6 +15,7 @@ import ToolArsenal from "./ToolArsenal";
 import Playbooks from "./Playbooks";
 import Terminal from "./Terminal";
 import KnowledgeGraph from "./KnowledgeGraph";
+import Osint from "./Osint";
 import "./neonTheme.css";
 
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ function AppRoutes() {
         <Route path="knowledge" element={<KnowledgeGraph />} />
         <Route path="banter" element={<Banter />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="osint" element={<Osint />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

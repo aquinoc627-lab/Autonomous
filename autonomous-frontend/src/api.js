@@ -149,4 +149,13 @@ export const playbooksAPI = {
     api.post(`/api/playbooks/executions/${execId}/step`, { action }),
 };
 
+// ── OSINT ─────────────────────────────────────────────────────────
+export const osintAPI = {
+  sherlock: (username) => api.get(`/api/osint/sherlock/${encodeURIComponent(username)}`),
+// ── Ghost Protocol ───────────────────────────────────────────
+export const ghostAPI = {
+  status: () => api.get("/api/ghost/status"),
+  toggle: (enable) => api.post(`/api/ghost/toggle?enable=${enable}`),
+};
+
 export default api;

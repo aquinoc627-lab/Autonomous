@@ -1,3 +1,7 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+
 import subprocess
 import asyncio
 import urllib.request
@@ -5,6 +9,8 @@ import urllib.error
 import urllib.parse
 import json
 import socket
+import ipaddress
+import re
 import shodan
 import requests
 from urllib.parse import urlparse
@@ -18,6 +24,8 @@ import uvicorn
 # Suppress insecure request warnings for targets without valid SSL
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
+
 app = FastAPI(
     title="Autonomous Cyber Suite API",
     description="Backend API for the Interactive Cyber Suite",
@@ -27,6 +35,16 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+# Enable CORS so the JS frontend can make requests to this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (update for production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost", "http://127.0.0.1", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +52,7 @@ app.add_middleware(
 
 @app.get("/api/status")
 async def get_status():
+    """Health check endpoint to verify the backend is running."""
     return {
         "status": "online",
         "message": "Autonomous API is running smoothly.",
@@ -42,6 +61,13 @@ async def get_status():
 
 @app.get("/api/osint/sherlock/{username}")
 async def run_sherlock(username: str):
+if __name__ == "__main__":
+    # Run the server on port 8000
+@app.get("/api/osint/sherlock/{username}")
+async def run_sherlock(username: str):
+    if not re.match(r"^[a-zA-Z0-9_-]+$", username):
+        return {"status": "error", "message": "Invalid username. Only alphanumeric characters, underscores, and dashes are allowed."}
+
     results = []
     cmd = ["sherlock", username, "--print-found", "--timeout", "3"]
     try:
@@ -76,6 +102,14 @@ async def check_breach(email: str, api_key: str = ""):
         with urllib.request.urlopen(req) as response:
             data = json.loads(response.read().decode())
             return {"status": "success", "target": email, "found": len(data), "breaches": data}
+
+    def _do_hibp_request():
+        with urllib.request.urlopen(req) as response:
+            return json.loads(response.read().decode())
+
+    try:
+        data = await asyncio.to_thread(_do_hibp_request)
+        return {"status": "success", "target": email, "found": len(data), "breaches": data}
     except urllib.error.HTTPError as e:
         if e.code == 404:
             return {"status": "success", "target": email, "found": 0, "breaches": []}
@@ -100,6 +134,11 @@ def get_decimal_from_dms(dms, ref):
 @app.post("/api/forensics/image")
 async def analyze_image(file: UploadFile = File(...)):
     try:
+        file_bytes = await file.read()
+        if len(file_bytes) > MAX_UPLOAD_SIZE:
+            return {"status": "error", "message": "File too large. Maximum upload size is 10MB."}
+        await file.seek(0)
+
         image = Image.open(file.file)
         exif_raw = image._getexif()
         if not exif_raw:
@@ -136,6 +175,10 @@ async def map_infrastructure(target: str, api_key: str = ""):
         api = shodan.Shodan(api_key)
         try:
             host_data = api.host(ip_address)
+
+        api = shodan.Shodan(api_key)
+        try:
+            host_data = await asyncio.to_thread(api.host, ip_address)
             services = []
             for item in host_data.get('data', []):
                 services.append({
@@ -175,6 +218,20 @@ async def web_archive_discovery(domain: str, limit: int = 100):
             for row in data[1:]:
                 results.append({"url": row[0], "timestamp": row[1], "mimetype": row[2], "status": row[3]})
             return {"status": "success", "target": clean_domain, "found": len(results), "urls": results}
+
+    def _do_archive_request():
+        req = urllib.request.Request(url, headers={"User-Agent": "Autonomous-Cyber-Suite"})
+        with urllib.request.urlopen(req) as response:
+            return json.loads(response.read().decode())
+
+    try:
+        data = await asyncio.to_thread(_do_archive_request)
+        if not data or len(data) <= 1:
+            return {"status": "success", "target": clean_domain, "found": 0, "urls": []}
+        results = []
+        for row in data[1:]:
+            results.append({"url": row[0], "timestamp": row[1], "mimetype": row[2], "status": row[3]})
+        return {"status": "success", "target": clean_domain, "found": len(results), "urls": results}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
@@ -225,6 +282,13 @@ async def validate_target(target_url: str):
         
         results["server_info"] = resp.headers.get("Server", "Unknown")
         
+
+    try:
+        resp = await asyncio.to_thread(requests.get, safe_url, timeout=5, verify=False)
+        lower_headers = {k.lower(): v for k, v in resp.headers.items()}
+
+        results["server_info"] = resp.headers.get("Server", "Unknown")
+
         security_headers = {
             "strict-transport-security": "Protects against MITM attacks (HSTS)",
             "x-frame-options": "Protects against Clickjacking",
@@ -233,6 +297,7 @@ async def validate_target(target_url: str):
             "x-xss-protection": "Deprecated — may introduce vulnerabilities; recommend removing or setting to '0'"
         }
         
+
         for header, desc in security_headers.items():
             if header not in lower_headers:
                 results["missing_headers"].append({"header": header, "risk": desc})
@@ -244,6 +309,10 @@ async def validate_target(target_url: str):
         for f in files_to_check:
             try:
                 file_resp = requests.get(base_url + f, timeout=3, verify=False)
+
+        for f in files_to_check:
+            try:
+                file_resp = await asyncio.to_thread(requests.get, base_url + f, timeout=3, verify=False)
                 content_type = file_resp.headers.get("content-type", "").lower()
                 # Flag the file as exposed if the server returns 200 and the response
                 # does not appear to be a generic HTML error/redirect page.
@@ -257,6 +326,9 @@ async def validate_target(target_url: str):
                 
         return {"status": "success", "data": results}
         
+
+        return {"status": "success", "data": results}
+
     except requests.exceptions.RequestException as e:
         return {"status": "error", "message": f"Could not connect to target: {str(e)}"}
     except Exception as e:

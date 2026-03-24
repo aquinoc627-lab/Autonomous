@@ -4,6 +4,7 @@ import { useAuth } from "./AuthContext";
 import NotificationCenter from "./NotificationCenter";
 import VoiceControl from "./VoiceControl";
 import MemorySearch from "./MemorySearch";
+import { ghostAPI } from "./api";
 import {
   MdDashboard,
   MdRocketLaunch,
@@ -22,7 +23,133 @@ import {
   MdCircle,
   MdMoreHoriz,
   MdGavel,
+  MdPersonSearch,
 } from "react-icons/md";
+
+
+/* ================================================================
+   GHOST PROTOCOL WIDGET
+   Sidebar toggle to spin up / tear down the ephemeral Tor proxy
+   ================================================================ */
+function GhostProtocolWidget() {
+  const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Check initial status on mount
+  useEffect(() => {
+    ghostAPI
+      .status()
+      .then((res) => {
+        if (res.data?.status === "success") setActive(res.data.active);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleToggle = async (e) => {
+    const enable = e.target.checked;
+    setLoading(true);
+    try {
+      const res = await ghostAPI.toggle(enable);
+      if (res.data?.status === "success") setActive(enable);
+      else setActive(!enable); // revert on backend error
+    } catch {
+      setActive(!enable); // revert on network error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        padding: "14px 16px",
+        borderTop: "1px solid rgba(255,255,255,0.07)",
+        marginTop: "auto",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 6,
+        }}
+      >
+        <span
+          style={{
+            color: active ? "#ff003c" : "var(--sidebar-text, #e0e6ed)",
+            fontWeight: 700,
+            fontSize: "0.8rem",
+            letterSpacing: "0.05em",
+            textShadow: active ? "0 0 8px #ff003c" : "none",
+            transition: "all 0.3s",
+          }}
+        >
+          👻 GHOST PROTOCOL
+        </span>
+        {/* Toggle switch */}
+        <label
+          style={{
+            position: "relative",
+            display: "inline-block",
+            width: 40,
+            height: 20,
+            flexShrink: 0,
+            opacity: loading ? 0.5 : 1,
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={handleToggle}
+            disabled={loading}
+            style={{ opacity: 0, width: 0, height: 0 }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              cursor: loading ? "not-allowed" : "pointer",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: active ? "#ff003c" : "#2a2e3f",
+              boxShadow: active ? "0 0 10px #ff003c" : "none",
+              borderRadius: 20,
+              transition: "0.4s",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                content: '""',
+                height: 16,
+                width: 16,
+                left: active ? 22 : 2,
+                bottom: 2,
+                backgroundColor: "white",
+                borderRadius: "50%",
+                transition: "0.4s",
+              }}
+            />
+          </span>
+        </label>
+      </div>
+      <p
+        style={{
+          fontSize: "0.7rem",
+          color: active ? "#ff003c" : "#666",
+          textShadow: active ? "0 0 5px #ff003c" : "none",
+          margin: 0,
+          transition: "all 0.3s",
+        }}
+      >
+        {active ? "Status: ACTIVE (Obfuscated)" : "Status: Clearnet (Exposed)"}
+      </p>
+    </div>
+  );
+}
 
 /* ================================================================
    SYSTEM STATUS BAR
@@ -163,6 +290,7 @@ function BottomNav() {
     { to: "/analytics", icon: <MdBarChart />, label: "Analytics" },
     { to: "/lab", icon: <MdBuild />, label: "Agent Lab" },
     { to: "/knowledge", icon: <MdAccountTree />, label: "Intel Graph" },
+    { to: "/osint", icon: <MdPersonSearch />, label: "OSINT" },
   ];
 
   const isActive = (to, exact) =>
@@ -332,6 +460,9 @@ export default function Layout() {
             <NavLink to="/knowledge" onClick={() => setSidebarOpen(false)}>
               <MdAccountTree /> <span>Intel Graph</span>
             </NavLink>
+            <NavLink to="/osint" onClick={() => setSidebarOpen(false)}>
+              <MdPersonSearch /> <span>OSINT</span>
+            </NavLink>
 
             <div className="sidebar-section-label">System</div>
 
@@ -345,6 +476,8 @@ export default function Layout() {
               <MdLogout /> <span>Logout</span>
             </button>
           </nav>
+
+          <GhostProtocolWidget />
 
           {user && (
             <div className="sidebar-user">
