@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 
 from fastapi import APIRouter, Depends
 
@@ -77,7 +78,7 @@ async def get_labs(current_user: User = Depends(get_current_user)):
                 container = _docker_client.containers.get(container_name)
                 is_running = container.status == "running"
                 if is_running:
-                    ports = container.attrs["NetworkSettings"]["Ports"]
+                    ports = container.attrs.get("NetworkSettings", {}).get("Ports") or {}
                     port_key = f"{config['container_port']}/tcp"
                     mappings = ports.get(port_key) or []
                     if mappings:
@@ -122,7 +123,7 @@ async def start_lab(lab_id: str, current_user: User = Depends(get_current_user))
         try:
             existing = _docker_client.containers.get(container_name)
             if existing.status == "running":
-                ports = existing.attrs["NetworkSettings"]["Ports"]
+                ports = existing.attrs.get("NetworkSettings", {}).get("Ports") or {}
                 port_key = f"{config['container_port']}/tcp"
                 mappings = ports.get(port_key) or []
                 host_port = mappings[0]["HostPort"] if mappings else None
@@ -142,9 +143,17 @@ async def start_lab(lab_id: str, current_user: User = Depends(get_current_user))
             detach=True,
             ports={f"{config['container_port']}/tcp": None},
         )
-        container.reload()
-        ports = container.attrs["NetworkSettings"]["Ports"]
-        port_key = f"{config['container_port']}/tcp"
+        
+        # Wait for port mappings to be populated
+        for _ in range(3):
+            container.reload()
+            ports = container.attrs.get("NetworkSettings", {}).get("Ports") or {}
+            port_key = f"{config['container_port']}/tcp"
+            mappings = ports.get(port_key) or []
+            if mappings:
+                break
+            time.sleep(0.5)
+
         mappings = ports.get(port_key) or []
         host_port = mappings[0]["HostPort"] if mappings else None
         return {
