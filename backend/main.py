@@ -32,6 +32,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
 # Enable CORS so the JS frontend can make requests to this API
 app.add_middleware(
     CORSMiddleware,
@@ -56,6 +59,8 @@ async def get_status():
         "active_modules": ["core"]
     }
 
+@app.get("/api/osint/sherlock/{username}")
+async def run_sherlock(username: str):
 if __name__ == "__main__":
     # Run the server on port 8000
 @app.get("/api/osint/sherlock/{username}")
@@ -93,6 +98,10 @@ async def check_breach(email: str, api_key: str = ""):
     url = f"https://haveibeenpwned.com/api/v3/breachedaccount/{urllib.parse.quote(email)}?truncateResponse=false"
     headers = {"hibp-api-key": api_key, "user-agent": "Autonomous-Cyber-Suite"}
     req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            return {"status": "success", "target": email, "found": len(data), "breaches": data}
 
     def _do_hibp_request():
         with urllib.request.urlopen(req) as response:
@@ -162,6 +171,10 @@ async def map_infrastructure(target: str, api_key: str = ""):
             ip_address = socket.gethostbyname(target)
         except socket.gaierror:
             return {"status": "error", "message": f"Could not resolve target: {target}"}
+        
+        api = shodan.Shodan(api_key)
+        try:
+            host_data = api.host(ip_address)
 
         api = shodan.Shodan(api_key)
         try:
@@ -195,6 +208,16 @@ async def map_infrastructure(target: str, api_key: str = ""):
 async def web_archive_discovery(domain: str, limit: int = 100):
     clean_domain = domain.replace("http://", "").replace("https://", "").split("/")[0]
     url = f"http://web.archive.org/cdx/search/cdx?url=*.{clean_domain}/*&output=json&fl=original,timestamp,mimetype,statuscode&collapse=urlkey&limit={limit}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Autonomous-Cyber-Suite"})
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            if not data or len(data) <= 1: 
+                return {"status": "success", "target": clean_domain, "found": 0, "urls": []}
+            results = []
+            for row in data[1:]:
+                results.append({"url": row[0], "timestamp": row[1], "mimetype": row[2], "status": row[3]})
+            return {"status": "success", "target": clean_domain, "found": len(results), "urls": results}
 
     def _do_archive_request():
         req = urllib.request.Request(url, headers={"User-Agent": "Autonomous-Cyber-Suite"})
@@ -228,6 +251,7 @@ async def validate_target(target_url: str):
         return {"status": "error", "message": "Only http and https URLs are supported."}
 
     # Resolve the hostname and block requests to private/loopback addresses
+    import ipaddress
     try:
         resolved_ip = socket.gethostbyname(hostname)
         ip_obj = ipaddress.ip_address(resolved_ip)
@@ -251,6 +275,13 @@ async def validate_target(target_url: str):
         "present_headers": {},
         "sensitive_files": []
     }
+    
+    try:
+        resp = requests.get(safe_url, timeout=5, verify=False)
+        lower_headers = {k.lower(): v for k, v in resp.headers.items()}
+        
+        results["server_info"] = resp.headers.get("Server", "Unknown")
+        
 
     try:
         resp = await asyncio.to_thread(requests.get, safe_url, timeout=5, verify=False)
@@ -265,6 +296,7 @@ async def validate_target(target_url: str):
             "content-security-policy": "Protects against XSS and data injection",
             "x-xss-protection": "Deprecated — may introduce vulnerabilities; recommend removing or setting to '0'"
         }
+        
 
         for header, desc in security_headers.items():
             if header not in lower_headers:
@@ -273,6 +305,10 @@ async def validate_target(target_url: str):
                 results["present_headers"][header] = lower_headers[header]
 
         files_to_check = ["/robots.txt", "/sitemap.xml", "/.git/HEAD", "/.env", "/.DS_Store"]
+        
+        for f in files_to_check:
+            try:
+                file_resp = requests.get(base_url + f, timeout=3, verify=False)
 
         for f in files_to_check:
             try:
@@ -287,6 +323,9 @@ async def validate_target(target_url: str):
                     results["sensitive_files"].append(f)
             except Exception:
                 continue
+                
+        return {"status": "success", "data": results}
+        
 
         return {"status": "success", "data": results}
 
