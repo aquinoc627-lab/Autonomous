@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from collections import defaultdict
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -33,6 +34,7 @@ from app.core.tool_registry import (
     get_categories,
     get_tool_count,
     search_tools,
+    TOOL_REGISTRY,
 )
 from app.core.command_engine import generate_command, CommandGenerationError
 from app.core.audit import record_audit
@@ -147,9 +149,14 @@ async def list_categories(
 ):
     """List all tool categories with tool counts and tool summaries."""
     categories = get_categories()
+
+    cat_tools_map = defaultdict(list)
+    for t in TOOL_REGISTRY:
+        cat_tools_map[t["category"]].append(t)
+
     result = []
     for cat in categories:
-        cat_tools = get_tools_by_category(cat)
+        cat_tools = cat_tools_map[cat]
         result.append(CategoryInfo(
             name=cat,
             tool_count=len(cat_tools),
