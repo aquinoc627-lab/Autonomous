@@ -157,35 +157,35 @@ async def health(
     mission completion rates, and real-time connection count.
     """
     # Agent availability
-    total_agents = (await db.execute(select(func.count()).select_from(Agent))).scalar() or 1
-    active_agents = (await db.execute(
-        select(func.count()).select_from(Agent).where(Agent.status.in_(["active", "idle"]))
-    )).scalar()
-    error_agents = (await db.execute(
-        select(func.count()).select_from(Agent).where(Agent.status == "error")
-    )).scalar()
-    offline_agents = (await db.execute(
-        select(func.count()).select_from(Agent).where(Agent.status == "offline")
-    )).scalar()
+    agent_status_result = await db.execute(
+        select(Agent.status, func.count()).group_by(Agent.status)
+    )
+    agent_counts = dict(agent_status_result.all())
+
+    active_count = agent_counts.get("active", 0)
+    idle_count = agent_counts.get("idle", 0)
+    error_agents = agent_counts.get("error", 0)
+    offline_agents = agent_counts.get("offline", 0)
+    total_agents = sum(agent_counts.values()) or 1
+    active_agents = active_count + idle_count
 
     # Mission completion rate
-    total_missions = (await db.execute(select(func.count()).select_from(Mission))).scalar() or 1
-    completed_missions = (await db.execute(
-        select(func.count()).select_from(Mission).where(Mission.status == "completed")
-    )).scalar()
-    failed_missions = (await db.execute(
-        select(func.count()).select_from(Mission).where(Mission.status == "failed")
-    )).scalar()
+    mission_status_result = await db.execute(
+        select(Mission.status, func.count()).group_by(Mission.status)
+    )
+    mission_counts = dict(mission_status_result.all())
+
+    completed_missions = mission_counts.get("completed", 0)
+    failed_missions = mission_counts.get("failed", 0)
+    in_progress = mission_counts.get("in_progress", 0)
+    pending = mission_counts.get("pending", 0)
+    total_missions = sum(mission_counts.values()) or 1
 
     return {
         "agent_availability": round(active_agents / total_agents * 100, 1),
         "agent_breakdown": {
-            "active": active_agents - (await db.execute(
-                select(func.count()).select_from(Agent).where(Agent.status == "idle")
-            )).scalar(),
-            "idle": (await db.execute(
-                select(func.count()).select_from(Agent).where(Agent.status == "idle")
-            )).scalar(),
+            "active": active_count,
+            "idle": idle_count,
             "error": error_agents,
             "offline": offline_agents,
         },
@@ -193,12 +193,8 @@ async def health(
         "mission_breakdown": {
             "completed": completed_missions,
             "failed": failed_missions,
-            "in_progress": (await db.execute(
-                select(func.count()).select_from(Mission).where(Mission.status == "in_progress")
-            )).scalar(),
-            "pending": (await db.execute(
-                select(func.count()).select_from(Mission).where(Mission.status == "pending")
-            )).scalar(),
+            "in_progress": in_progress,
+            "pending": pending,
         },
         "websocket_connections": manager.active_count,
         "status": "operational",
