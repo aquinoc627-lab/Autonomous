@@ -29,6 +29,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
 # Enable CORS so the JS frontend can make requests to this API
 app.add_middleware(
     CORSMiddleware,
