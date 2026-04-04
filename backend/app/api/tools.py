@@ -187,6 +187,7 @@ async def tool_stats(
 
     os_counts = {"linux": 0, "windows": 0, "android": 0}
     severity_counts = {"info": 0, "warning": 0, "danger": 0}
+    category_counts = {cat: 0 for cat in categories}
     confirmation_required = 0
 
     for t in tools:
@@ -196,10 +197,16 @@ async def tool_stats(
         if t["requires_confirmation"]:
             confirmation_required += 1
 
+        cat = t["category"]
+        if cat in category_counts:
+            category_counts[cat] += 1
+        else:
+            category_counts[cat] = 1
+
     return {
         "total_tools": len(tools),
         "total_categories": len(categories),
-        "categories": {cat: len(get_tools_by_category(cat)) for cat in categories},
+        "categories": category_counts,
         "os_support": os_counts,
         "severity_breakdown": severity_counts,
         "confirmation_required": confirmation_required,
