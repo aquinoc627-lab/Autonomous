@@ -95,40 +95,44 @@ async def activity(
     now = datetime.now(timezone.utc)
     seven_days_ago = now - timedelta(days=7)
 
+    seven_days_ago_start = (now - timedelta(days=6)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+
+    missions_res = await db.execute(
+        select(func.date(Mission.created_at), func.count())
+        .where(Mission.created_at >= seven_days_ago_start)
+        .group_by(func.date(Mission.created_at))
+    )
+    missions_counts = {str(row[0]): row[1] for row in missions_res.all()}
+
+    banter_res = await db.execute(
+        select(func.date(Banter.created_at), func.count())
+        .where(Banter.created_at >= seven_days_ago_start)
+        .group_by(func.date(Banter.created_at))
+    )
+    banter_counts = {str(row[0]): row[1] for row in banter_res.all()}
+
+    assignments_res = await db.execute(
+        select(func.date(AgentMission.assigned_at), func.count())
+        .where(AgentMission.assigned_at >= seven_days_ago_start)
+        .group_by(func.date(AgentMission.assigned_at))
+    )
+    assignments_counts = {str(row[0]): row[1] for row in assignments_res.all()}
+
     # Build daily activity data
     days = []
     for i in range(7):
         day_start = (now - timedelta(days=6 - i)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
-        day_end = day_start + timedelta(days=1)
-
-        missions_created = (await db.execute(
-            select(func.count()).select_from(Mission).where(
-                Mission.created_at >= day_start,
-                Mission.created_at < day_end,
-            )
-        )).scalar()
-
-        banter_created = (await db.execute(
-            select(func.count()).select_from(Banter).where(
-                Banter.created_at >= day_start,
-                Banter.created_at < day_end,
-            )
-        )).scalar()
-
-        assignments_created = (await db.execute(
-            select(func.count()).select_from(AgentMission).where(
-                AgentMission.assigned_at >= day_start,
-                AgentMission.assigned_at < day_end,
-            )
-        )).scalar()
+        date_str = day_start.strftime("%Y-%m-%d")
 
         days.append({
-            "date": day_start.strftime("%Y-%m-%d"),
-            "missions": missions_created,
-            "banter": banter_created,
-            "assignments": assignments_created,
+            "date": date_str,
+            "missions": missions_counts.get(date_str, 0),
+            "banter": banter_counts.get(date_str, 0),
+            "assignments": assignments_counts.get(date_str, 0),
         })
 
     # Banter by message type
@@ -157,35 +161,35 @@ async def health(
     mission completion rates, and real-time connection count.
     """
     # Agent availability
-    total_agents = (await db.execute(select(func.count()).select_from(Agent))).scalar() or 1
-    active_agents = (await db.execute(
-        select(func.count()).select_from(Agent).where(Agent.status.in_(["active", "idle"]))
-    )).scalar()
-    error_agents = (await db.execute(
-        select(func.count()).select_from(Agent).where(Agent.status == "error")
-    )).scalar()
-    offline_agents = (await db.execute(
-        select(func.count()).select_from(Agent).where(Agent.status == "offline")
-    )).scalar()
+    agent_status_result = await db.execute(
+        select(Agent.status, func.count()).group_by(Agent.status)
+    )
+    agent_counts = dict(agent_status_result.all())
+
+    active_count = agent_counts.get("active", 0)
+    idle_count = agent_counts.get("idle", 0)
+    error_agents = agent_counts.get("error", 0)
+    offline_agents = agent_counts.get("offline", 0)
+    total_agents = sum(agent_counts.values()) or 1
+    active_agents = active_count + idle_count
 
     # Mission completion rate
-    total_missions = (await db.execute(select(func.count()).select_from(Mission))).scalar() or 1
-    completed_missions = (await db.execute(
-        select(func.count()).select_from(Mission).where(Mission.status == "completed")
-    )).scalar()
-    failed_missions = (await db.execute(
-        select(func.count()).select_from(Mission).where(Mission.status == "failed")
-    )).scalar()
+    mission_status_result = await db.execute(
+        select(Mission.status, func.count()).group_by(Mission.status)
+    )
+    mission_counts = dict(mission_status_result.all())
+
+    completed_missions = mission_counts.get("completed", 0)
+    failed_missions = mission_counts.get("failed", 0)
+    in_progress = mission_counts.get("in_progress", 0)
+    pending = mission_counts.get("pending", 0)
+    total_missions = sum(mission_counts.values()) or 1
 
     return {
         "agent_availability": round(active_agents / total_agents * 100, 1),
         "agent_breakdown": {
-            "active": active_agents - (await db.execute(
-                select(func.count()).select_from(Agent).where(Agent.status == "idle")
-            )).scalar(),
-            "idle": (await db.execute(
-                select(func.count()).select_from(Agent).where(Agent.status == "idle")
-            )).scalar(),
+            "active": active_count,
+            "idle": idle_count,
             "error": error_agents,
             "offline": offline_agents,
         },
@@ -193,12 +197,8 @@ async def health(
         "mission_breakdown": {
             "completed": completed_missions,
             "failed": failed_missions,
-            "in_progress": (await db.execute(
-                select(func.count()).select_from(Mission).where(Mission.status == "in_progress")
-            )).scalar(),
-            "pending": (await db.execute(
-                select(func.count()).select_from(Mission).where(Mission.status == "pending")
-            )).scalar(),
+            "in_progress": in_progress,
+            "pending": pending,
         },
         "websocket_connections": manager.active_count,
         "status": "operational",

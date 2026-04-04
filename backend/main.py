@@ -2,6 +2,8 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
+import os
+import subprocess
 import asyncio
 import urllib.request
 import urllib.error
@@ -30,6 +32,10 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+# Enable CORS so the JS frontend can make requests to this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -214,7 +220,6 @@ async def validate_target(target_url: str):
         return {"status": "error", "message": "Only http and https URLs are supported."}
 
     # Resolve the hostname and block requests to private/loopback addresses
-    import ipaddress
     try:
         resolved_ip = socket.gethostbyname(hostname)
         ip_obj = ipaddress.ip_address(resolved_ip)
@@ -254,10 +259,10 @@ async def validate_target(target_url: str):
         }
 
         for header, desc in security_headers.items():
-            if header not in lower_headers:
-                results["missing_headers"].append({"header": header, "risk": desc})
-            else:
+            if header in lower_headers:
                 results["present_headers"][header] = lower_headers[header]
+            else:
+                results["missing_headers"].append({"header": header, "risk": desc})
 
         files_to_check = ["/robots.txt", "/sitemap.xml", "/.git/HEAD", "/.env", "/.DS_Store"]
         

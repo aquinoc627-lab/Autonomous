@@ -114,8 +114,8 @@ class CodeSandbox:
 
         start_time = asyncio.get_event_loop().time()
         try:
-            process = await asyncio.create_subprocess_shell(
-                command,
+            process = await asyncio.create_subprocess_exec(
+                *cmd_parts,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )

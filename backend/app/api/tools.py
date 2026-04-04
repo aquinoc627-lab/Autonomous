@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from collections import defaultdict
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -33,6 +34,7 @@ from app.core.tool_registry import (
     get_categories,
     get_tool_count,
     search_tools,
+    TOOL_REGISTRY,
 )
 from app.core.command_engine import generate_command, CommandGenerationError
 from app.core.audit import record_audit
@@ -147,9 +149,14 @@ async def list_categories(
 ):
     """List all tool categories with tool counts and tool summaries."""
     categories = get_categories()
+
+    cat_tools_map = defaultdict(list)
+    for t in TOOL_REGISTRY:
+        cat_tools_map[t["category"]].append(t)
+
     result = []
     for cat in categories:
-        cat_tools = get_tools_by_category(cat)
+        cat_tools = cat_tools_map[cat]
         result.append(CategoryInfo(
             name=cat,
             tool_count=len(cat_tools),
@@ -180,6 +187,7 @@ async def tool_stats(
 
     os_counts = {"linux": 0, "windows": 0, "android": 0}
     severity_counts = {"info": 0, "warning": 0, "danger": 0}
+    category_counts = {cat: 0 for cat in categories}
     confirmation_required = 0
 
     for t in tools:
@@ -189,10 +197,16 @@ async def tool_stats(
         if t["requires_confirmation"]:
             confirmation_required += 1
 
+        cat = t["category"]
+        if cat in category_counts:
+            category_counts[cat] += 1
+        else:
+            category_counts[cat] = 1
+
     return {
         "total_tools": len(tools),
         "total_categories": len(categories),
-        "categories": {cat: len(get_tools_by_category(cat)) for cat in categories},
+        "categories": category_counts,
         "os_support": os_counts,
         "severity_breakdown": severity_counts,
         "confirmation_required": confirmation_required,
