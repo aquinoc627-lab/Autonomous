@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
+import os
 import subprocess
 import asyncio
 import urllib.request
@@ -9,17 +10,13 @@ import urllib.error
 import urllib.parse
 import json
 import socket
-import ipaddress
 import re
 import shodan
 import requests
 from urllib.parse import urlparse
 import urllib3
-from fastapi import FastAPI, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-import uvicorn
 
 # Suppress insecure request warnings for targets without valid SSL
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -36,6 +33,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost", "http://127.0.0.1", "http://localhost:8000", "*"],
+    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -110,7 +108,7 @@ def get_decimal_from_dms(dms, ref):
     minutes = float(dms[1])
     seconds = float(dms[2])
     decimal = degrees + (minutes / 60.0) + (seconds / 3600.0)
-    if ref in ['S', 'W']:
+    if ref.upper() in ['S', 'W']:
         decimal = -decimal
     return decimal
 
@@ -187,6 +185,7 @@ async def map_infrastructure(target: str, api_key: str = ""):
 async def web_archive_discovery(domain: str, limit: int = 100):
     clean_domain = domain.replace("http://", "").replace("https://", "").split("/")[0]
     url = f"http://web.archive.org/cdx/search/cdx?url=*.{clean_domain}/*&output=json&fl=original,timestamp,mimetype,statuscode&collapse=urlkey&limit={limit}"
+
     def _do_archive_request():
         req = urllib.request.Request(url, headers={"User-Agent": "Autonomous-Cyber-Suite"})
         with urllib.request.urlopen(req) as response:
@@ -219,7 +218,6 @@ async def validate_target(target_url: str):
         return {"status": "error", "message": "Only http and https URLs are supported."}
 
     # Resolve the hostname and block requests to private/loopback addresses
-    import ipaddress
     try:
         resolved_ip = socket.gethostbyname(hostname)
         ip_obj = ipaddress.ip_address(resolved_ip)
@@ -257,16 +255,16 @@ async def validate_target(target_url: str):
             "content-security-policy": "Protects against XSS and data injection",
             "x-xss-protection": "Deprecated — may introduce vulnerabilities; recommend removing or setting to '0'"
         }
-        
 
         for header, desc in security_headers.items():
-            if header not in lower_headers:
-                results["missing_headers"].append({"header": header, "risk": desc})
-            else:
+            if header in lower_headers:
                 results["present_headers"][header] = lower_headers[header]
+            else:
+                results["missing_headers"].append({"header": header, "risk": desc})
 
         files_to_check = ["/robots.txt", "/sitemap.xml", "/.git/HEAD", "/.env", "/.DS_Store"]
 
+        
         for f in files_to_check:
             try:
                 file_resp = await asyncio.to_thread(requests.get, base_url + f, timeout=3, verify=False)
@@ -281,9 +279,6 @@ async def validate_target(target_url: str):
             except Exception:
                 continue
                 
-        return {"status": "success", "data": results}
-        
-
         return {"status": "success", "data": results}
 
     except requests.exceptions.RequestException as e:
