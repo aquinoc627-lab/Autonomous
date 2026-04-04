@@ -1,3 +1,5 @@
+import QuantumWarfare from "./QuantumWarfare";
+import { MdAutoFixHigh } from "react-icons/md";
 import PortalNetwork from "./PortalNetwork";
 import { MdOutlinePublic } from "react-icons/md";
 import GenerativeDashboard from "./GenerativeDashboard";
@@ -174,6 +176,13 @@ export default function AutonomousView() {
           style={{ display: "flex", alignItems: "center", gap: 8 }}
         >
           <MdOutlinePublic /> Target Portals
+        </button>
+        <button 
+          className={`btn ${activeTab === "quantum" ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setActiveTab("quantum")}
+          style={{ display: "flex", alignItems: "center", gap: 8, background: activeTab === "quantum" ? '#ff0040' : 'transparent', color: activeTab === "quantum" ? '#fff' : '#ff0040', borderColor: '#ff0040' }}
+        >
+          <MdAutoFixHigh /> Quantum Warfare
         </button>
       </div>
 
@@ -393,8 +402,10 @@ export default function AutonomousView() {
         <AutonomousGraph />
       ) : activeTab === "generative" ? (
         <GenerativeDashboard />
-      ) : (
+      ) : activeTab === "portals" ? (
         <PortalNetwork />
+      ) : (
+        <div style={{ height: "600px" }}><QuantumWarfare /></div>
       )}
 
       {/* AR Mode */}
