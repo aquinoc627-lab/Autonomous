@@ -1,3 +1,4 @@
+import { MdPayment } from "react-icons/md";
 import { useNexus } from "./NexusContext";
 import GlobalOmnibar from "./GlobalOmnibar";
 import React, { useState, useEffect, useCallback } from "react";
@@ -228,7 +229,14 @@ function SystemStatusBar({ user }) {
       </div>
       <div className="status-bar-right">
         <span className="status-version">Autonomous v2.0</span>
-        <span className="status-role">{user?.role?.toUpperCase()}</span>
+        <span className="status-role" style={{ marginRight: 8 }}>{user?.role?.toUpperCase()}</span>
+        <span style={{ 
+          background: user?.tier === 'nexus_prime' ? '#ff0040' : user?.tier === 'commander' ? 'var(--neon-cyan)' : 'var(--neon-green)', 
+          color: user?.tier === 'nexus_prime' ? '#fff' : '#000', 
+          padding: '2px 8px', borderRadius: 4, fontWeight: 'bold', fontSize: 10, textTransform: 'uppercase' 
+        }}>
+          {user?.tier?.replace('_', ' ') || 'FREE TRIAL'}
+        </span>
       </div>
     </div>
   );
@@ -473,6 +481,9 @@ export default function Layout() {
 
             <NavLink to="/lab" onClick={() => setSidebarOpen(false)}>
               <MdBuild /> <span>Agent Lab</span>
+            </NavLink>
+            <NavLink to="/billing" onClick={() => setSidebarOpen(false)}>
+              <MdPayment /> <span>Billing & Upgrade</span>
             </NavLink>
 
             <div style={{ flex: 1 }} />

@@ -1,3 +1,4 @@
+import Billing from "./Billing";
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -75,6 +76,7 @@ function AppRoutes() {
         <Route path="banter" element={<Banter />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="osint" element={<Osint />} />
+        <Route path="billing" element={<Billing />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

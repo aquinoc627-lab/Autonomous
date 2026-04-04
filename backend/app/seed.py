@@ -55,6 +55,7 @@ async def seed() -> None:
             hashed_password=bcrypt.hash("Admin123!"),
             role="admin",
             is_active=True,
+            tier="nexus_prime",
         )
         operator = User(
             id=_uid(),
@@ -63,6 +64,8 @@ async def seed() -> None:
             hashed_password=bcrypt.hash("Operator1!"),
             role="operator",
             is_active=True,
+            tier="free_trial",
+            trial_end_date=_now(14 * 24), # 14 days
         )
         session.add_all([admin, operator])
         await session.flush()

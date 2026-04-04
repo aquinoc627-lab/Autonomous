@@ -24,7 +24,12 @@ import {
   MdBubbleChart,
 } from "react-icons/md";
 
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+
 export default function AutonomousView() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [activeTab, setActiveTab] = useState("grid"); // "grid", "warroom", or "collaboration"
@@ -401,11 +406,11 @@ export default function AutonomousView() {
       ) : activeTab === "collaboration" ? (
         <AutonomousGraph />
       ) : activeTab === "generative" ? (
-        <GenerativeDashboard />
+        (user?.tier === "commander" || user?.tier === "nexus_prime") ? <GenerativeDashboard /> : <FeatureLock requiredTier="commander" featureName="Adaptive Ops Dashboard" />
       ) : activeTab === "portals" ? (
-        <PortalNetwork />
+        (user?.tier === "commander" || user?.tier === "nexus_prime") ? <PortalNetwork /> : <FeatureLock requiredTier="commander" featureName="Target Portals" />
       ) : (
-        <div style={{ height: "600px" }}><QuantumWarfare /></div>
+        user?.tier === "nexus_prime" ? <div style={{ height: "600px" }}><QuantumWarfare /></div> : <FeatureLock requiredTier="nexus_prime" featureName="Quantum Warfare" />
       )}
 
       {/* AR Mode */}
@@ -418,6 +423,23 @@ export default function AutonomousView() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+// Access Control Component
+function FeatureLock({ requiredTier, featureName }) {
+  const navigate = useNavigate();
+  return (
+    <div style={{ textAlign: "center", padding: "64px 24px", background: "rgba(255, 0, 64, 0.05)", border: "1px dashed rgba(255, 0, 64, 0.3)", borderRadius: "16px", marginTop: "24px" }}>
+      <h2 style={{ color: "#ff0040", marginBottom: "16px" }}>Clearance Denied</h2>
+      <p style={{ color: "var(--text-muted)", fontSize: "1.1rem", marginBottom: "24px" }}>
+        The <strong>{featureName}</strong> requires a <strong>{requiredTier.replace('_', ' ').toUpperCase()}</strong> license. 
+        Your current tier does not grant access to this module.
+      </p>
+      <button className="btn btn-primary" onClick={() => navigate('/billing')} style={{ background: "#ff0040", border: "none", color: "#fff" }}>
+        Upgrade Security Clearance
+      </button>
     </div>
   );
 }

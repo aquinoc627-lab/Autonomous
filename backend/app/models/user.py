@@ -1,20 +1,9 @@
-"""
-Autonomous — User Model
-
-Represents an authenticated user of the platform.  Each user has a role
-(``admin`` or ``operator``) that governs access to privileged endpoints.
-
-Security notes:
-  - Passwords are stored as bcrypt hashes via ``passlib``.
-  - The ``is_active`` flag allows soft-disabling accounts without deletion.
-  - Username and email carry unique constraints to prevent duplicates.
-"""
-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
+from datetime import datetime
 
-from sqlalchemy import Boolean, String, Index
+from sqlalchemy import Boolean, String, Index, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKey
@@ -31,21 +20,17 @@ class User(Base, UUIDPrimaryKey, TimestampMixin):
     # ------------------------------------------------------------------
     # Columns
     # ------------------------------------------------------------------
-    username: Mapped[str] = mapped_column(
-        String(64), unique=True, nullable=False
-    )
-    email: Mapped[str] = mapped_column(
-        String(320), unique=True, nullable=False
-    )
-    hashed_password: Mapped[str] = mapped_column(
-        String(128), nullable=False
-    )
-    role: Mapped[str] = mapped_column(
-        String(16), nullable=False, default="operator"
-    )
-    is_active: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
+    username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
+    role: Mapped[str] = mapped_column(String(16), nullable=False, default="operator")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    
+    # Tiering & Subscriptions
+    tier: Mapped[str] = mapped_column(String(32), nullable=False, default="free_trial")
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    trial_end_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # ------------------------------------------------------------------
     # Relationships
@@ -66,7 +51,8 @@ class User(Base, UUIDPrimaryKey, TimestampMixin):
     __table_args__ = (
         Index("ix_users_role", "role"),
         Index("ix_users_is_active", "is_active"),
+        Index("ix_users_tier", "tier"),
     )
 
     def __repr__(self) -> str:
-        return f"<User id={self.id!r} username={self.username!r} role={self.role!r}>"
+        return f"<User id={self.id!r} username={self.username!r} role={self.role!r} tier={self.tier!r}>"

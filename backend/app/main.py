@@ -21,7 +21,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api import agents, analytics, auth, banter, labs, missions, tools, ws, playbooks
 from app.api import agents, analytics, auth, banter, missions, osint, tools, ws, playbooks
-from app.api import agents, analytics, auth, banter, ghost, missions, tools, ws, playbooks
+from app.api import agents, analytics, auth, banter, ghost, missions, tools, ws, playbooks, labs, osint, billing
 from app.core.config import (
     APP_DESCRIPTION,
     APP_TITLE,
@@ -131,6 +131,7 @@ app.include_router(playbooks.router)
 app.include_router(labs.router)
 app.include_router(osint.router)
 app.include_router(ghost.router)
+app.include_router(billing.router, prefix="/api/billing", tags=["Billing"])
 
 
 # ---------------------------------------------------------------------------

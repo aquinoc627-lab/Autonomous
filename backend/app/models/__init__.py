@@ -13,6 +13,7 @@ from app.models.agent_mission import AgentMission  # noqa: F401
 from app.models.banter import Banter  # noqa: F401
 from app.models.refresh_token import RefreshToken  # noqa: F401
 from app.models.audit_log import AuditLog  # noqa: F401
+from app.models.payment_transaction import PaymentTransaction  # noqa: F401
 
 __all__ = [
     "Base",
@@ -23,4 +24,5 @@ __all__ = [
     "Banter",
     "RefreshToken",
     "AuditLog",
+    "PaymentTransaction",
 ]

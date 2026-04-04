@@ -90,6 +90,8 @@ class UserRead(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    tier: Optional[str] = "free_trial"
+    trial_end_date: Optional[datetime] = None
 
 
 class UserUpdate(BaseModel):

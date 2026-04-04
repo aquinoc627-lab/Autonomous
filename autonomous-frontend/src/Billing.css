@@ -1,0 +1,193 @@
+/* ================================================================
+   BILLING STYLES
+   ================================================================ */
+.billing-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.billing-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.billing-header h2 {
+  font-size: 2.5rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.billing-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.billing-alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin: 24px auto;
+  max-width: 600px;
+  font-family: "Fira Code", monospace;
+}
+
+.alert-pending { background: rgba(255, 230, 0, 0.1); border: 1px solid var(--neon-yellow); color: var(--neon-yellow); }
+.alert-success { background: rgba(57, 255, 20, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); }
+.alert-error { background: rgba(255, 0, 64, 0.1); border: 1px solid var(--neon-red); color: var(--neon-red); }
+
+.billing-cycle-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  color: var(--text-muted);
+}
+
+.billing-cycle-toggle .active {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Switch styling */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #2a2e3f;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px; width: 26px;
+  left: 4px; bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+input:checked + .slider { background-color: var(--neon-cyan); }
+input:checked + .slider:before { transform: translateX(26px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+/* Grid */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.pricing-card {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.pricing-card.featured {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.pricing-card.prime {
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a050a 100%);
+  border-color: rgba(255, 0, 64, 0.5);
+}
+
+.tier-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--neon-cyan);
+  color: #000;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.tier-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.pricing-card h3 {
+  margin: 0 0 16px 0;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.price {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.price span {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  flex: 1;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #e0e6ed;
+  font-size: 0.95rem;
+}
+
+.feature-list li svg {
+  color: var(--neon-cyan);
+  flex-shrink: 0;
+}
+
+.feature-list li.included {
+  color: var(--text-muted);
+}
+.feature-list li.included svg {
+  color: var(--text-muted);
+}
+
+.tier-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.current-tier {
+  opacity: 0.5;
+  pointer-events: none;
+}
