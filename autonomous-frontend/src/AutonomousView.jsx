@@ -1,3 +1,5 @@
+import PortalNetwork from "./PortalNetwork";
+import { MdOutlinePublic } from "react-icons/md";
 import GenerativeDashboard from "./GenerativeDashboard";
 import { MdOutlineArchitecture } from "react-icons/md";
 import React, { useCallback, useMemo, useState } from "react";
@@ -165,6 +167,13 @@ export default function AutonomousView() {
           style={{ display: "flex", alignItems: "center", gap: 8 }}
         >
           <MdOutlineArchitecture /> Adaptive Ops
+        </button>
+        <button 
+          className={`btn ${activeTab === "portals" ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setActiveTab("portals")}
+          style={{ display: "flex", alignItems: "center", gap: 8 }}
+        >
+          <MdOutlinePublic /> Target Portals
         </button>
       </div>
 
@@ -382,8 +391,10 @@ export default function AutonomousView() {
         </>
       ) : activeTab === "collaboration" ? (
         <AutonomousGraph />
-      ) : (
+      ) : activeTab === "generative" ? (
         <GenerativeDashboard />
+      ) : (
+        <PortalNetwork />
       )}
 
       {/* AR Mode */}
