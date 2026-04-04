@@ -1,0 +1,106 @@
+/* ================================================================
+   FLUID TERMINAL STYLES
+   ================================================================ */
+.fluid-terminal-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  box-shadow: inset 0 0 50px rgba(0, 240, 255, 0.05);
+}
+
+.fluid-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hidden-terminal-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.fluid-terminal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fluid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  pointer-events: auto;
+}
+
+.fluid-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fluid-header-left h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.fluid-icon {
+  font-size: 24px;
+  color: var(--neon-cyan);
+  filter: drop-shadow(0 0 5px var(--neon-cyan));
+}
+
+.fluid-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Fira Code", monospace;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 1px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.idle {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.status-dot.processing {
+  background: var(--neon-yellow);
+  box-shadow: 0 0 10px var(--neon-yellow);
+  animation: quantumPulse 0.5s infinite alternate;
+}
+
+@keyframes quantumPulse {
+  from { opacity: 0.4; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.2); }
+}
