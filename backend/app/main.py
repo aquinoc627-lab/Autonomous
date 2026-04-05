@@ -19,8 +19,6 @@ from fastapi import FastAPI, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.api import agents, analytics, auth, banter, labs, missions, tools, ws, playbooks
-from app.api import agents, analytics, auth, banter, missions, osint, tools, ws, playbooks
 from app.api import agents, analytics, auth, banter, ghost, missions, tools, ws, playbooks, labs, osint, billing, api_keys, system_override
 from app.core.config import (
     APP_DESCRIPTION,
