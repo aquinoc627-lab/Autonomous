@@ -57,6 +57,8 @@ This will build and start the entire Autonomous stack (PostgreSQL, FastAPI backe
 
 ### Demo Credentials
 
+> ⚠️ **Security Warning**: These credentials are for **local development only**. You **MUST** change all default passwords before deploying to any environment accessible from the network. Failure to do so creates a critical security vulnerability.
+
 | Username | Password | Role |
 |----------|----------|------|
 | `admin` | `Admin123!` | `admin` |

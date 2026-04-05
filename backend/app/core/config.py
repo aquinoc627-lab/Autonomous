@@ -11,8 +11,11 @@ provided via environment variables and never hard-coded.
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -75,3 +78,24 @@ CORS_ORIGINS: list[str] = os.getenv(
 APP_TITLE: str = "Autonomous API"
 APP_VERSION: str = "0.1.0"
 APP_DESCRIPTION: str = "Orchestration platform for managing agents, missions, and real-time banter."
+
+# ---------------------------------------------------------------------------
+# Startup environment validation (warnings only — never crash on bad config)
+# ---------------------------------------------------------------------------
+_DEFAULT_SECRET = "CHANGE-ME-IN-PRODUCTION-use-openssl-rand-hex-32"
+
+if SECRET_KEY == _DEFAULT_SECRET:
+    logger.warning(
+        "WARNING: Using default SECRET_KEY. Set a unique value for production deployments."
+    )
+
+if not os.getenv("GEMINI_API_KEY"):
+    logger.warning(
+        "WARNING: GEMINI_API_KEY is not set. "
+        "Agent Brain and Memory Palace features will be unavailable."
+    )
+
+if not os.getenv("DATABASE_URL"):
+    logger.info(
+        "DATABASE_URL is not set. Using SQLite as the default database for local development."
+    )
