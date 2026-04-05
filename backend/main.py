@@ -1,3 +1,4 @@
+import ipaddress
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -32,7 +33,6 @@ app = FastAPI(
 # Enable CORS so the JS frontend can make requests to this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "http://127.0.0.1", "http://localhost:8000", "*"],
     allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
