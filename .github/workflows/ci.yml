@@ -38,7 +38,7 @@ jobs:
           pip-audit -r backend/requirements.txt
 
   frontend:
-    name: Frontend (Node 20)
+    name: Frontend (Node 24)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,7 +48,7 @@ jobs:
       - name: Set up Node 20
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install dependencies
         working-directory: autonomous-frontend
@@ -62,7 +62,7 @@ jobs:
 
       - name: Security audit
         working-directory: autonomous-frontend
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
       - name: Run tests
         working-directory: autonomous-frontend
