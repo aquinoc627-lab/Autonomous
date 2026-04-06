@@ -18,7 +18,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Text, Index, func
+from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Index, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
