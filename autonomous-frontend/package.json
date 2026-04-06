@@ -65,6 +65,11 @@
       "icon": "public/logo512.png"
     }
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(iwer|@iwer|@mediapipe|@react-three|three|@react-three/xr|@react-three/fiber|@react-three/drei)/)"
+    ]
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
