@@ -26,6 +26,7 @@ from app.core.security import (
     require_admin,
     verify_password,
 )
+from app.core.limiter import limiter
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.schemas.schemas import (
@@ -83,6 +84,7 @@ async def register(
 
 
 @router.post("/login", response_model=TokenPair)
+@limiter.limit("5/minute")  # Strict limit to prevent brute-force attacks on credentials
 async def login(
     body: LoginRequest,
     request: Request,
@@ -139,6 +141,7 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenPair)
+@limiter.limit("5/minute")  # Strict limit to prevent token-refresh abuse
 async def refresh(
     body: TokenRefresh,
     request: Request,

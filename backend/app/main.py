@@ -17,6 +17,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler  # public-facing despite underscore; see slowapi docs
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api import agents, analytics, auth, banter, ghost, missions, tools, ws, playbooks, labs, osint, billing, api_keys, system_override
@@ -26,6 +29,7 @@ from app.core.config import (
     APP_VERSION,
     CORS_ORIGINS,
 )
+from app.core.limiter import limiter
 from app.core.database import init_db
 from app.core.tasks import agent_brain_loop, set_autonomous_mode, get_autonomous_mode
 from app.core.security import get_current_user
@@ -102,6 +106,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # ---------------------------------------------------------------------------
 # Middleware Registration
 # ---------------------------------------------------------------------------
@@ -114,6 +121,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SlowAPIMiddleware)
 
 # ---------------------------------------------------------------------------
 # Routers
