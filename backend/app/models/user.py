@@ -33,6 +33,10 @@ class User(Base, UUIDPrimaryKey, TimestampMixin):
     stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     trial_end_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # 2FA
+    totp_secret: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    totp_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
     # ------------------------------------------------------------------
     # Relationships
     # ------------------------------------------------------------------
