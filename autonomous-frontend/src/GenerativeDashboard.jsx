@@ -1,292 +1,273 @@
+import React, { useState, useEffect, useRef } from "react";
+import { MdLanguage, MdWifi, MdPersonSearch, MdOutlineArchitecture } from "react-icons/md";
+import "./GenerativeDashboard.css";
+
 /* ================================================================
-   GENERATIVE DASHBOARD STYLES
+   GENERATIVE CONTEXTS
    ================================================================ */
-.generative-dashboard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  gap: 16px;
-}
 
-.generative-controls {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 16px;
-  background: rgba(0, 240, 255, 0.05);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: var(--radius-lg);
-  flex-wrap: wrap;
-}
+// Context 1: Web Application Audit (HTTP Waterfall & DOM Tree)
+const WebAuditWidget = () => {
+  const [requests, setRequests] = useState([]);
 
-.generative-label {
-  font-family: "Fira Code", monospace;
-  font-weight: 700;
-  color: var(--neon-cyan);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 16px;
-}
+  useEffect(() => {
+    // Simulate streaming HTTP requests
+    let count = 0;
+    const interval = setInterval(() => {
+      count++;
+      setRequests((prev) => {
+        const newReq = {
+          id: count,
+          method: ["GET", "POST", "OPTIONS"][Math.floor(Math.random() * 3)],
+          path: ["/api/v1/auth", "/login.php", "/admin/dashboard", "/wp-content/"][Math.floor(Math.random() * 4)],
+          status: [200, 403, 404, 500][Math.floor(Math.random() * 4)],
+          duration: Math.floor(Math.random() * 500) + 10,
+        };
+        // Keep last 15
+        return [...prev, newReq].slice(-15);
+      });
+    }, 800);
+    return () => clearInterval(interval);
+  }, []);
 
-.generative-canvas {
-  flex: 1;
-  min-height: 500px;
-  background: #0a0d14;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  return (
+    <div className="gen-widget web-audit-widget fade-in-up">
+      <div className="gen-widget-header">
+        <MdLanguage /> Web Application Audit
+      </div>
+      <div className="gen-widget-body" style={{ display: 'flex', gap: 24 }}>
+        
+        {/* HTTP Waterfall */}
+        <div className="http-waterfall" style={{ flex: 1 }}>
+          <h4 style={{ color: 'var(--neon-cyan)', marginBottom: 12 }}>HTTP Request Waterfall</h4>
+          <div className="waterfall-container">
+            {requests.map((req) => (
+              <div key={req.id} className="waterfall-row">
+                <div className="wf-method" style={{ color: req.method === "POST" ? "var(--neon-yellow)" : "var(--neon-cyan)" }}>{req.method}</div>
+                <div className="wf-path">{req.path}</div>
+                <div className="wf-status" style={{ color: req.status >= 400 ? "var(--neon-red)" : "var(--neon-green)" }}>{req.status}</div>
+                <div className="wf-bar-track">
+                  <div 
+                    className="wf-bar" 
+                    style={{ 
+                      width: `${Math.min(100, req.duration / 5)}%`,
+                      background: req.status >= 400 ? "var(--neon-red)" : "var(--neon-cyan)"
+                    }} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-/* Morphing / Dissolving Effect */
-.generative-canvas.dissolving {
-  opacity: 0;
-  transform: scale(0.98);
-  filter: blur(8px) contrast(1.2);
-}
+        {/* Simulated DOM Tree */}
+        <div className="dom-tree-view" style={{ flex: 1 }}>
+          <h4 style={{ color: 'var(--neon-cyan)', marginBottom: 12 }}>DOM Traversal Graph</h4>
+          <div className="dom-tree-container">
+            <div className="dom-node root glow-pulse">
+              document
+              <div className="dom-children">
+                <div className="dom-node">
+                  html
+                  <div className="dom-children">
+                    <div className="dom-node">head</div>
+                    <div className="dom-node active-target">
+                      body (Scanning...)
+                      <div className="dom-children">
+                        <div className="dom-node vulnerable">&lt;form id="login"&gt; (SQLi detected)</div>
+                        <div className="dom-node">&lt;script src="app.js"&gt;</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-.generative-canvas.solid {
-  opacity: 1;
-  transform: scale(1);
-  filter: blur(0px) contrast(1);
-}
+      </div>
+    </div>
+  );
+};
 
-/* Fade In Up for inner widgets */
-.fade-in-up {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+// Context 2: WiFi Hacking (RF Spectrum Analyzer)
+const WiFiHackingWidget = () => {
+  const canvasRef = useRef(null);
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animationId;
+    let offset = 0;
 
-/* ----------------------------------------------------------------
-   IDLE STATE
-   ---------------------------------------------------------------- */
-.gen-idle-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--neon-cyan);
-  font-family: "Fira Code", monospace;
-  text-align: center;
-}
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 2;
 
-.idle-ring {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 2px dashed rgba(0, 240, 255, 0.3);
-  border-top-color: var(--neon-cyan);
-  animation: spin 4s linear infinite;
-  margin-bottom: 24px;
-}
+      // Draw 3 frequency bands
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        const colors = ["#00f0ff", "#39ff14", "#ff0040"];
+        ctx.strokeStyle = colors[i];
+        
+        for (let x = 0; x < canvas.width; x++) {
+          // Complex sine wave for RF simulation
+          const y = (Math.sin(x * 0.05 + offset + i) * 30) + 
+                    (Math.sin(x * 0.1 + offset * 2) * 10) + 
+                    (canvas.height / 2) + (i * 20 - 20);
+          
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
 
-/* ----------------------------------------------------------------
-   SHARED WIDGET STYLES
-   ---------------------------------------------------------------- */
-.gen-widget {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+      // Draw Handshake Capture spikes
+      if (Math.random() > 0.95) {
+        ctx.fillStyle = "rgba(255, 230, 0, 0.5)";
+        const spikeX = Math.random() * canvas.width;
+        ctx.fillRect(spikeX, 0, 4, canvas.height);
+        ctx.fillStyle = "#ffe600";
+        ctx.fillText("EAPOL Handshake", spikeX + 8, Math.random() * canvas.height);
+      }
 
-.gen-widget-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--neon-cyan);
-  margin-bottom: 24px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
+      offset += 0.1;
+      animationId = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(animationId);
+  }, []);
 
-/* ----------------------------------------------------------------
-   WEB AUDIT WIDGET
-   ---------------------------------------------------------------- */
-.waterfall-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: "Fira Code", monospace;
-  font-size: 0.8rem;
-}
+  return (
+    <div className="gen-widget wifi-widget fade-in-up">
+      <div className="gen-widget-header" style={{ color: "var(--neon-green)" }}>
+        <MdWifi /> Radio Frequency Spectrum Analyzer (802.11)
+      </div>
+      <div className="gen-widget-body">
+        <canvas 
+          ref={canvasRef} 
+          width={800} 
+          height={300} 
+          style={{ width: '100%', height: '300px', background: '#050a0f', borderRadius: 8, border: '1px solid rgba(57, 255, 20, 0.3)' }} 
+        />
+        <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
+          <div className="rf-stat-box">
+            <div className="label">Channel</div>
+            <div className="value">6 (2.437 GHz)</div>
+          </div>
+          <div className="rf-stat-box">
+            <div className="label">BSSID</div>
+            <div className="value" style={{ color: "var(--neon-yellow)" }}>00:14:22:01:23:45</div>
+          </div>
+          <div className="rf-stat-box">
+            <div className="label">Deauth Frames</div>
+            <div className="value" style={{ color: "var(--neon-red)" }}>Transmitting...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-.waterfall-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+// Context 3: OSINT Recon (Identity Graph)
+const OsintWidget = () => {
+  return (
+    <div className="gen-widget osint-widget fade-in-up">
+      <div className="gen-widget-header" style={{ color: "var(--neon-yellow)" }}>
+        <MdPersonSearch /> OSINT Identity Graph
+      </div>
+      <div className="gen-widget-body">
+        <div className="osint-grid">
+          {/* Main Target */}
+          <div className="osint-card primary-target glow-pulse-yellow">
+            <div className="osint-avatar">JD</div>
+            <h4>John Doe</h4>
+            <p>Target Profile</p>
+            <div className="osint-data">Email: j.doe@example.com</div>
+          </div>
+          
+          {/* Connecting Lines (Simulated via borders/layout in CSS) */}
+          <div className="osint-links">
+            <div className="osint-link" />
+            <div className="osint-link" />
+            <div className="osint-link" />
+          </div>
 
-.wf-method { width: 60px; font-weight: bold; }
-.wf-path { width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e0e6ed; }
-.wf-status { width: 40px; text-align: right; }
-.wf-bar-track {
-  flex: 1;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  position: relative;
-}
-.wf-bar {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
+          {/* Discovered Entities */}
+          <div className="osint-discoveries">
+            <div className="osint-card sub-target">
+              <MdLanguage className="icon" />
+              <h4>LinkedIn</h4>
+              <div className="osint-data">/in/johndoe99</div>
+            </div>
+            <div className="osint-card sub-target">
+              <MdLanguage className="icon" />
+              <h4>GitHub</h4>
+              <div className="osint-data">@jdoe-dev (3 leaked keys)</div>
+            </div>
+            <div className="osint-card sub-target danger">
+              <MdLanguage className="icon" />
+              <h4>Darknet Paste</h4>
+              <div className="osint-data">Password hash found (2021)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-.dom-tree-container {
-  font-family: "Fira Code", monospace;
-  color: #a0aab5;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 240, 255, 0.2);
-}
+/* ================================================================
+   MAIN GENERATIVE DASHBOARD
+   ================================================================ */
+export default function GenerativeDashboard() {
+  const [context, setContext] = useState("idle");
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-.dom-node {
-  margin-left: 16px;
-  padding: 4px 0;
-  position: relative;
-}
+  // Simulate context switching with a brief "dissolve" state
+  const switchContext = (newContext) => {
+    if (newContext === context) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setContext(newContext);
+      setIsTransitioning(false);
+    }, 600); // 600ms dissolve animation
+  };
 
-.dom-node::before {
-  content: "";
-  position: absolute;
-  left: -12px;
-  top: 12px;
-  width: 8px;
-  height: 1px;
-  background: rgba(0, 240, 255, 0.3);
-}
+  return (
+    <div className="generative-dashboard">
+      <div className="generative-controls">
+        <span className="generative-label"><MdOutlineArchitecture /> GENERATIVE UI ENGINE:</span>
+        <button className={`btn ${context === "idle" ? "btn-primary" : "btn-secondary"}`} onClick={() => switchContext("idle")}>
+          Idle
+        </button>
+        <button className={`btn ${context === "web_audit" ? "btn-primary" : "btn-secondary"}`} onClick={() => switchContext("web_audit")}>
+          Web Audit
+        </button>
+        <button className={`btn ${context === "wifi_hack" ? "btn-primary" : "btn-secondary"}`} onClick={() => switchContext("wifi_hack")}>
+          WiFi Hack
+        </button>
+        <button className={`btn ${context === "osint" ? "btn-primary" : "btn-secondary"}`} onClick={() => switchContext("osint")}>
+          OSINT Recon
+        </button>
+      </div>
 
-.dom-node.root { margin-left: 0; }
-.dom-node.root::before { display: none; }
+      <div className={`generative-canvas ${isTransitioning ? "dissolving" : "solid"}`}>
+        {context === "idle" && (
+          <div className="gen-idle-state">
+            <div className="idle-ring" />
+            <p>Awaiting AI Context Shift...</p>
+            <span style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 8 }}>
+              The UI will physically rebuild itself based on the active agent's operational focus.
+            </span>
+          </div>
+        )}
 
-.dom-node.active-target {
-  color: var(--neon-cyan);
-  font-weight: bold;
-}
-
-.dom-node.vulnerable {
-  color: var(--neon-red);
-  font-weight: bold;
-  text-shadow: 0 0 5px var(--neon-red);
-  animation: pulseRed 2s infinite;
-}
-
-@keyframes pulseRed {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
-}
-
-/* ----------------------------------------------------------------
-   WIFI WIDGET
-   ---------------------------------------------------------------- */
-.rf-stat-box {
-  background: rgba(57, 255, 20, 0.05);
-  border: 1px solid rgba(57, 255, 20, 0.2);
-  border-radius: 8px;
-  padding: 16px;
-  flex: 1;
-  text-align: center;
-}
-
-.rf-stat-box .label {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.rf-stat-box .value {
-  font-size: 1.2rem;
-  font-family: "Fira Code", monospace;
-  color: #fff;
-}
-
-/* ----------------------------------------------------------------
-   OSINT WIDGET
-   ---------------------------------------------------------------- */
-.osint-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
-
-.osint-card {
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 230, 0, 0.3);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  min-width: 200px;
-}
-
-.osint-card.primary-target {
-  border-color: var(--neon-yellow);
-}
-
-.osint-card.sub-target {
-  border-color: var(--neon-cyan);
-}
-
-.osint-card.danger {
-  border-color: var(--neon-red);
-  box-shadow: inset 0 0 20px rgba(255, 0, 64, 0.2);
-}
-
-.osint-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--neon-yellow);
-  color: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0 auto 12px auto;
-}
-
-.osint-card h4 {
-  margin: 0 0 4px 0;
-  color: #fff;
-}
-
-.osint-data {
-  font-family: "Fira Code", monospace;
-  font-size: 0.85rem;
-  color: var(--neon-cyan);
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-.osint-discoveries {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.glow-pulse-yellow {
-  box-shadow: 0 0 20px rgba(255, 230, 0, 0.2);
-  animation: pulseYellow 3s infinite;
-}
-
-@keyframes pulseYellow {
-  0% { box-shadow: 0 0 10px rgba(255, 230, 0, 0.2); }
-  50% { box-shadow: 0 0 30px rgba(255, 230, 0, 0.5); }
-  100% { box-shadow: 0 0 10px rgba(255, 230, 0, 0.2); }
+        {context === "web_audit" && <WebAuditWidget />}
+        {context === "wifi_hack" && <WiFiHackingWidget />}
+        {context === "osint" && <OsintWidget />}
+      </div>
+    </div>
+  );
 }
