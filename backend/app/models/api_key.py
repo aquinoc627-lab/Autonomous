@@ -13,7 +13,7 @@ class ApiKey(Base, UUIDPrimaryKey, TimestampMixin):
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     key_hash: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
-    key_prefix: Mapped[str] = mapped_column(String(8), nullable=False) # For displaying "nx_live_1a2b***"
+    key_prefix: Mapped[str] = mapped_column(String(8), nullable=False)  # For displaying "nx_live_1a2b***"
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     user: Mapped["User"] = relationship("User", back_populates="api_keys", lazy="selectin")

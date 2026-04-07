@@ -4,6 +4,7 @@ from sqlalchemy import String, Float, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKey
 
+
 class PaymentTransaction(Base, UUIDPrimaryKey, TimestampMixin):
     __tablename__ = "payment_transactions"
 
