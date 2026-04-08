@@ -41,3 +41,6 @@ Thumbs.db
 !.env.example
 data/
 *.sqlite3
+
+# Local virtualenv / env dirs
+autonomous_env/
