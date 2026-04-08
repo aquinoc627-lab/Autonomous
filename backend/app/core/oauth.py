@@ -43,7 +43,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import (
-    AUTH_MODE,
     OAUTH_ALGORITHMS,
     OAUTH_AUDIENCE,
     OAUTH_DOMAIN,

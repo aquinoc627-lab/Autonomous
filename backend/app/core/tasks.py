@@ -17,7 +17,6 @@ async def agent_brain_loop():
     """
     Background task that periodically selects an active agent to 'think' and act.
     """
-    global AUTONOMOUS_MODE
     logger.info("Starting Agent Brain background loop...")
     
     while True:
