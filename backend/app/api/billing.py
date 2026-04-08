@@ -4,7 +4,7 @@ import os
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -22,11 +22,14 @@ PACKAGES = {
     "nexus_prime_annual": {"amount": 4990.00, "tier": "nexus_prime"},
 }
 
+
 def get_stripe_api_key() -> str:
     return os.getenv("STRIPE_API_KEY", "sk_test_emergent")
 
+
 def get_webhook_secret() -> str:
     return os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
 
 @router.post("/create-checkout-session")
 async def create_checkout_session(
@@ -90,6 +93,7 @@ async def create_checkout_session(
 
     return {"url": session.url, "session_id": session.id}
 
+
 @router.get("/checkout-status/{session_id}")
 async def get_checkout_status(
     session_id: str,
@@ -127,6 +131,7 @@ async def get_checkout_status(
         await db.commit()
 
     return {"payment_status": tx.payment_status, "status": tx.status}
+
 
 @router.post("/webhook/stripe")
 async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -13,6 +13,7 @@ import uuid
 
 router = APIRouter()
 
+
 @router.post("/abort-all", status_code=200)
 async def abort_all_missions(
     request: Request,
@@ -21,26 +22,26 @@ async def abort_all_missions(
 ):
     """
     THE KILL SWITCH
-    Instantly halt all running missions, disable autonomous mode, 
+    Instantly halt all running missions, disable autonomous mode,
     and log an immutable, tamper-proof audit entry.
     """
     if current_user.role != "admin" and current_user.tier != "nexus_prime":
         raise HTTPException(status_code=403, detail="Emergency Override requires Admin Role or Nexus Prime clearance.")
-    
+
     # 1. Disable global autonomous AI logic loop
     set_autonomous_mode(False)
-    
+
     # 2. Mark all active/pending missions as failed/aborted
     active_missions_res = await db.execute(
         select(Mission).where(Mission.status.in_(["in_progress", "pending"]))
     )
     active_missions = active_missions_res.scalars().all()
-    
+
     count = 0
     for m in active_missions:
         m.status = "failed"
         count += 1
-        
+
         # Broadcast critical system alert
         alert = Banter(
             id=str(uuid.uuid4()),
@@ -50,7 +51,7 @@ async def abort_all_missions(
             sender_id=current_user.id
         )
         db.add(alert)
-        
+
     await db.commit()
 
     # 3. Create tamper-proof audit record

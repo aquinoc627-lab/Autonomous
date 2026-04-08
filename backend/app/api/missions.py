@@ -62,8 +62,8 @@ async def list_missions(
         stmt = stmt.where(Mission.parent_id == parent_id)
     else:
         # By default, only show top-level missions
-        stmt = stmt.where(Mission.parent_id == None)
-        
+        stmt = stmt.where(Mission.parent_id.is_(None))
+
     result = await db.execute(stmt)
     return result.scalars().all()
 

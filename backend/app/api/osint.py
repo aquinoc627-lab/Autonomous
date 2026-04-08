@@ -29,6 +29,7 @@ router = APIRouter(prefix="/api/osint", tags=["OSINT"])
 # Response Schemas
 # ---------------------------------------------------------------------------
 
+
 class SherlockResult(BaseModel):
     site: str
     url: str

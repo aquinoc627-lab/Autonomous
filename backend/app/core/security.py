@@ -149,18 +149,18 @@ async def get_current_user(
         import hashlib
         from app.models.api_key import ApiKey
         key_hash = hashlib.sha256(api_key_header.encode()).hexdigest()
-        
-        result = await db.execute(select(ApiKey).where(ApiKey.key_hash == key_hash, ApiKey.is_active == True))
+
+        result = await db.execute(select(ApiKey).where(ApiKey.key_hash == key_hash, ApiKey.is_active.is_(True)))
         api_key_obj = result.scalar_one_or_none()
-        
+
         if not api_key_obj:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or revoked API Key",
             )
-            
+
         from app.models.user import User
-        user_res = await db.execute(select(User).where(User.id == api_key_obj.user_id, User.is_active == True))
+        user_res = await db.execute(select(User).where(User.id == api_key_obj.user_id, User.is_active.is_(True)))
         user = user_res.scalar_one_or_none()
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user")
@@ -174,7 +174,7 @@ async def get_current_user(
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     token = auth_header.split(" ")[1]
 
     if AUTH_MODE == "oauth":

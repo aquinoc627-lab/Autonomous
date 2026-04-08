@@ -3,6 +3,7 @@ import psutil
 
 router = APIRouter()
 
+
 @router.get("/stats")
 async def get_system_stats():
     # interval=0.1 is required for the first CPU reading to be accurate
