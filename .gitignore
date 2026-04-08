@@ -41,7 +41,3 @@ Thumbs.db
 !.env.example
 data/
 *.sqlite3
--e 
-# Environment files
-*.env
-*.env.*
