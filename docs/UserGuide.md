@@ -29,14 +29,9 @@ Welcome to **Autonomous**, the AI-powered Orchestration Command Center. This gui
 
 ## 1. Logging In
 
-Navigate to the platform URL (e.g., `http://localhost:3000`). Enter your username and password on the Login page. On success, you are redirected to the main dashboard.
+Navigate to the platform URL (e.g., `http://localhost:3000`). Enter your email and password on the Login page. On success, you are redirected to the main dashboard.
 
-**Default development credentials** (change before any network deployment):
-
-| Username | Password | Role |
-|----------|----------|------|
-| `admin` | `Admin123!` | Admin |
-| `operator1` | `Operator1!` | Operator |
+Users sign up with their own email address and password.
 
 > Admins have full access to all features. Operators have read/write access but cannot bypass security confirmation gates for dangerous tools.
 

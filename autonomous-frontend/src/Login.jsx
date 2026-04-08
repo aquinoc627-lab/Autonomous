@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await login(username, password);
+      await login(email, password);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.detail || "Login failed");
@@ -33,14 +33,14 @@ export default function Login() {
         {error && <div className="error-msg">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Username</label>
+            <label>Email</label>
             <input
               className="form-input"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
-              autoComplete="username"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email address"
+              autoComplete="email"
               required
             />
           </div>
@@ -60,9 +60,6 @@ export default function Login() {
             {loading ? "Authenticating..." : "Login"}
           </button>
         </form>
-        <p style={{ marginTop: 20, fontSize: 12, color: "var(--text-muted)" }}>
-          Demo: admin / Admin123! &nbsp;|&nbsp; operator1 / Operator1!
-        </p>
       </div>
     </div>
   );

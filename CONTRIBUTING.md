@@ -32,6 +32,8 @@ docker-compose up -d --build
    cd backend
    pip install -r requirements.txt
    alembic upgrade head
+   export SEED_OWNER_EMAIL="your-email@example.com"
+   export SEED_OWNER_PASSWORD="YourStrongPassword1"
    python app/seed.py
    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
    ```

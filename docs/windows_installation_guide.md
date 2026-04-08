@@ -89,6 +89,8 @@ This method allows you to run the backend and frontend services independently fo
 5.  Run database migrations and seed initial data:
     ```bash
     alembic upgrade head
+    set SEED_OWNER_EMAIL=your-email@example.com
+    set SEED_OWNER_PASSWORD=YourStrongPassword1
     python app/seed.py
     ```
 6.  Start the FastAPI backend server:

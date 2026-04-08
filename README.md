@@ -71,6 +71,8 @@ This will build and start the entire Autonomous stack (PostgreSQL, FastAPI backe
     pip install -r requirements.txt
     # Create backend/.env with DATABASE_URL, SECRET_KEY, GEMINI_API_KEY, etc.
     alembic upgrade head
+    export SEED_OWNER_EMAIL="your-email@example.com"
+    export SEED_OWNER_PASSWORD="YourStrongPassword1"
     python app/seed.py
     uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ```
@@ -83,14 +85,9 @@ This will build and start the entire Autonomous stack (PostgreSQL, FastAPI backe
     npm start
     ```
 
-### Demo Credentials
+### Account Access
 
-> ⚠️ **Security Warning**: These credentials are for **local development only**. You **MUST** change all default passwords and the `SECRET_KEY` before deploying to any environment accessible from the network.
-
-| Username | Password | Role |
-|----------|----------|------|
-| `admin` | `Admin123!` | `admin` |
-| `operator1` | `Operator1!` | `operator` |
+Users authenticate with their own email address and password. Create user accounts through the registration flow or the `/api/auth/register` endpoint.
 
 ---
 

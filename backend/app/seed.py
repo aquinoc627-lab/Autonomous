@@ -5,7 +5,7 @@ Populates the database with sample data for fast demo and development.
 Run with:  python -m app.seed
 
 Creates:
-  - 2 users (admin + operator)
+  - 1 owner user (email-based login)
   - 5 agents with varied statuses
   - 5 missions with varied statuses and priorities
   - 8 agent-mission assignments
@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import os
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -48,26 +49,23 @@ async def seed() -> None:
         # ------------------------------------------------------------------
         # Users
         # ------------------------------------------------------------------
-        admin = User(
+        seed_owner_email = os.getenv("SEED_OWNER_EMAIL")
+        seed_owner_password = os.getenv("SEED_OWNER_PASSWORD")
+        if not seed_owner_email or not seed_owner_password:
+            raise RuntimeError(
+                "SEED_OWNER_EMAIL and SEED_OWNER_PASSWORD are required to run seeding."
+            )
+
+        owner = User(
             id=_uid(),
-            username="admin",
-            email="admin@autonomous.local",
-            hashed_password=bcrypt.hash("Admin123!"),
+            username=seed_owner_email,
+            email=seed_owner_email,
+            hashed_password=bcrypt.hash(seed_owner_password),
             role="admin",
             is_active=True,
             tier="nexus_prime",
         )
-        operator = User(
-            id=_uid(),
-            username="operator1",
-            email="operator1@autonomous.local",
-            hashed_password=bcrypt.hash("Operator1!"),
-            role="operator",
-            is_active=True,
-            tier="free_trial",
-            trial_end_date=_now(14 * 24), # 14 days
-        )
-        session.add_all([admin, operator])
+        session.add(owner)
         await session.flush()
 
         # ------------------------------------------------------------------
@@ -77,7 +75,7 @@ async def seed() -> None:
             Agent(
                 id=_uid(), name="Recon-Alpha", status="active",
                 description="Primary reconnaissance agent — stealthy, fast, and precise.",
-                created_by=admin.id,
+                created_by=owner.id,
                 persona={
                     "avatar_color": "#00f0ff",
                     "icon": "satellite",
@@ -88,7 +86,7 @@ async def seed() -> None:
             Agent(
                 id=_uid(), name="Recon-Bravo", status="idle",
                 description="Secondary reconnaissance agent — patient observer, deep scanner.",
-                created_by=admin.id,
+                created_by=owner.id,
                 persona={
                     "avatar_color": "#39ff14",
                     "icon": "eye",
@@ -99,7 +97,7 @@ async def seed() -> None:
             Agent(
                 id=_uid(), name="Exploit-Charlie", status="active",
                 description="Exploitation specialist — aggressive, adaptive, relentless.",
-                created_by=admin.id,
+                created_by=owner.id,
                 persona={
                     "avatar_color": "#ff006e",
                     "icon": "crosshair",
@@ -110,7 +108,7 @@ async def seed() -> None:
             Agent(
                 id=_uid(), name="Monitor-Delta", status="offline",
                 description="Continuous monitoring agent — vigilant sentinel, never sleeps.",
-                created_by=operator.id,
+                created_by=owner.id,
                 persona={
                     "avatar_color": "#bf00ff",
                     "icon": "shield",
@@ -121,7 +119,7 @@ async def seed() -> None:
             Agent(
                 id=_uid(), name="Analyst-Echo", status="error",
                 description="Data analysis and reporting agent — brilliant but temperamental.",
-                created_by=operator.id,
+                created_by=owner.id,
                 persona={
                     "avatar_color": "#ff6b00",
                     "icon": "brain",
@@ -137,11 +135,11 @@ async def seed() -> None:
         # Missions
         # ------------------------------------------------------------------
         missions = [
-            Mission(id=_uid(), name="Perimeter Scan", description="Full network perimeter scan of external assets", status="in_progress", priority="high", created_by=admin.id, started_at=_now(-2)),
-            Mission(id=_uid(), name="Credential Audit", description="Audit stored credentials and rotate expired keys", status="pending", priority="critical", created_by=admin.id),
-            Mission(id=_uid(), name="Vulnerability Assessment", description="Run vulnerability scans against staging environment", status="completed", priority="medium", created_by=operator.id, started_at=_now(-48), completed_at=_now(-24)),
-            Mission(id=_uid(), name="Threat Intelligence Sync", description="Synchronize threat feeds from external sources", status="in_progress", priority="medium", created_by=operator.id, started_at=_now(-6)),
-            Mission(id=_uid(), name="Incident Response Drill", description="Simulated breach response exercise", status="failed", priority="high", created_by=admin.id, started_at=_now(-72), completed_at=_now(-70)),
+            Mission(id=_uid(), name="Perimeter Scan", description="Full network perimeter scan of external assets", status="in_progress", priority="high", created_by=owner.id, started_at=_now(-2)),
+            Mission(id=_uid(), name="Credential Audit", description="Audit stored credentials and rotate expired keys", status="pending", priority="critical", created_by=owner.id),
+            Mission(id=_uid(), name="Vulnerability Assessment", description="Run vulnerability scans against staging environment", status="completed", priority="medium", created_by=owner.id, started_at=_now(-48), completed_at=_now(-24)),
+            Mission(id=_uid(), name="Threat Intelligence Sync", description="Synchronize threat feeds from external sources", status="in_progress", priority="medium", created_by=owner.id, started_at=_now(-6)),
+            Mission(id=_uid(), name="Incident Response Drill", description="Simulated breach response exercise", status="failed", priority="high", created_by=owner.id, started_at=_now(-72), completed_at=_now(-70)),
         ]
         session.add_all(missions)
         await session.flush()
@@ -150,14 +148,14 @@ async def seed() -> None:
         # Agent ↔ Mission assignments
         # ------------------------------------------------------------------
         assignments = [
-            AgentMission(agent_id=agents[0].id, mission_id=missions[0].id, assigned_by=admin.id),
-            AgentMission(agent_id=agents[1].id, mission_id=missions[0].id, assigned_by=admin.id),
-            AgentMission(agent_id=agents[2].id, mission_id=missions[1].id, assigned_by=admin.id),
-            AgentMission(agent_id=agents[0].id, mission_id=missions[2].id, assigned_by=operator.id),
-            AgentMission(agent_id=agents[3].id, mission_id=missions[3].id, assigned_by=operator.id),
-            AgentMission(agent_id=agents[4].id, mission_id=missions[3].id, assigned_by=operator.id),
-            AgentMission(agent_id=agents[2].id, mission_id=missions[4].id, assigned_by=admin.id),
-            AgentMission(agent_id=agents[4].id, mission_id=missions[4].id, assigned_by=admin.id),
+            AgentMission(agent_id=agents[0].id, mission_id=missions[0].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[1].id, mission_id=missions[0].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[2].id, mission_id=missions[1].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[0].id, mission_id=missions[2].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[3].id, mission_id=missions[3].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[4].id, mission_id=missions[3].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[2].id, mission_id=missions[4].id, assigned_by=owner.id),
+            AgentMission(agent_id=agents[4].id, mission_id=missions[4].id, assigned_by=owner.id),
         ]
         session.add_all(assignments)
         await session.flush()
@@ -167,16 +165,16 @@ async def seed() -> None:
         # ------------------------------------------------------------------
         banter = [
             Banter(id=_uid(), message="Perimeter scan initiated on all external IPs.", message_type="system", mission_id=missions[0].id, created_at=_now(-2)),
-            Banter(id=_uid(), message="Recon-Alpha reporting: 47 open ports detected so far.", message_type="status_update", sender_id=operator.id, mission_id=missions[0].id, agent_id=agents[0].id, created_at=_now(-1.5)),
-            Banter(id=_uid(), message="Recon-Bravo standing by for assignment.", message_type="chat", sender_id=operator.id, agent_id=agents[1].id, created_at=_now(-1)),
+            Banter(id=_uid(), message="Recon-Alpha reporting: 47 open ports detected so far.", message_type="status_update", sender_id=owner.id, mission_id=missions[0].id, agent_id=agents[0].id, created_at=_now(-1.5)),
+            Banter(id=_uid(), message="Recon-Bravo standing by for assignment.", message_type="chat", sender_id=owner.id, agent_id=agents[1].id, created_at=_now(-1)),
             Banter(id=_uid(), message="Credential audit queued — awaiting admin approval.", message_type="system", mission_id=missions[1].id, created_at=_now(-0.5)),
-            Banter(id=_uid(), message="Vulnerability assessment complete. 12 findings, 3 critical.", message_type="alert", sender_id=operator.id, mission_id=missions[2].id, created_at=_now(-24)),
+            Banter(id=_uid(), message="Vulnerability assessment complete. 12 findings, 3 critical.", message_type="alert", sender_id=owner.id, mission_id=missions[2].id, created_at=_now(-24)),
             Banter(id=_uid(), message="Threat feeds updated from 4 sources.", message_type="status_update", mission_id=missions[3].id, agent_id=agents[3].id, created_at=_now(-5)),
             Banter(id=_uid(), message="Monitor-Delta went offline unexpectedly.", message_type="alert", agent_id=agents[3].id, created_at=_now(-4)),
             Banter(id=_uid(), message="Incident response drill failed — timeout on containment step.", message_type="system", mission_id=missions[4].id, created_at=_now(-70)),
-            Banter(id=_uid(), message="Analyst-Echo encountered a processing error on dataset 7.", message_type="alert", sender_id=admin.id, agent_id=agents[4].id, created_at=_now(-3)),
-            Banter(id=_uid(), message="All agents, please report status.", message_type="chat", sender_id=admin.id, created_at=_now(-0.25)),
-            Banter(id=_uid(), message="Exploit-Charlie ready for credential audit assignment.", message_type="chat", sender_id=operator.id, agent_id=agents[2].id, created_at=_now(-0.1)),
+            Banter(id=_uid(), message="Analyst-Echo encountered a processing error on dataset 7.", message_type="alert", sender_id=owner.id, agent_id=agents[4].id, created_at=_now(-3)),
+            Banter(id=_uid(), message="All agents, please report status.", message_type="chat", sender_id=owner.id, created_at=_now(-0.25)),
+            Banter(id=_uid(), message="Exploit-Charlie ready for credential audit assignment.", message_type="chat", sender_id=owner.id, agent_id=agents[2].id, created_at=_now(-0.1)),
             Banter(id=_uid(), message="System health check: CPU 42%, Memory 67%, Disk 31%.", message_type="system", created_at=_now()),
         ]
         session.add_all(banter)
@@ -185,7 +183,7 @@ async def seed() -> None:
         # Audit log entry for the seed itself
         # ------------------------------------------------------------------
         session.add(AuditLog(
-            user_id=admin.id,
+            user_id=owner.id,
             action="seed",
             entity_type="system",
             entity_id=None,
@@ -196,7 +194,7 @@ async def seed() -> None:
         await session.commit()
 
     print("Database seeded successfully.")
-    print("  Users:       admin / Admin123!   |   operator1 / Operator1!")
+    print("  Users:       1 owner account (email-based login)")
     print("  Agents:      5")
     print("  Missions:    5")
     print("  Assignments: 8")

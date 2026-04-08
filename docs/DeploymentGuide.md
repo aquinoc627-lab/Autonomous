@@ -136,7 +136,9 @@ pip install -r requirements.txt
 # Run database migrations
 alembic upgrade head
 
-# Seed initial data (creates admin user and sample agents/missions)
+# Seed initial data (requires SEED_OWNER_EMAIL and SEED_OWNER_PASSWORD)
+export SEED_OWNER_EMAIL="your-email@example.com"
+export SEED_OWNER_PASSWORD="YourStrongPassword1"
 python3 app/seed.py
 
 # Start the backend server
@@ -172,14 +174,7 @@ npm start
 
 The React app will open automatically at `http://localhost:3000`.
 
-**Default login credentials:**
-
-| Username | Password | Role |
-|----------|----------|------|
-| `admin` | `Admin123!` | Admin |
-| `operator1` | `Operator1!` | Operator |
-
-> ⚠️ Change these passwords immediately if the platform will be accessible to others.
+Users authenticate with their own email and password. Create user accounts via the registration flow or `/api/auth/register`.
 
 ---
 
@@ -213,7 +208,7 @@ Access the platform at `http://localhost:3000`. For production Docker deployment
 | Port 3000 or 8000 already in use | Find and kill the conflicting process: `lsof -i :3000` then `kill <PID>`. Alternatively, change the port in `package.json` or the `uvicorn` command. |
 | Cannot reach `localhost:3000` from Windows browser (WSL 2) | Run `ip addr show eth0` in Kali to get the WSL IP if localhost forwarding isn't working, and navigate to that IP instead. Alternatively, run `wsl --shutdown` and restart WSL. |
 | Gemini API errors in backend logs | Verify `GEMINI_API_KEY` is set and valid. Check your API quota at [aistudio.google.com](https://aistudio.google.com). |
-| Database not seeded / no agents visible | Re-run `python3 app/seed.py` from the `backend/` directory with the virtual environment activated. |
+| Database not seeded / no agents visible | Ensure `SEED_OWNER_EMAIL` and `SEED_OWNER_PASSWORD` are set, then re-run `python3 app/seed.py` from the `backend/` directory with the virtual environment activated. |
 
 ---
 

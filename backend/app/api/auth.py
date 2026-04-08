@@ -2,7 +2,7 @@
 Autonomous — Authentication API
 
 Endpoints:
-  POST /api/auth/register  — create a new user (admin only)
+  POST /api/auth/register  — create a new user account
   POST /api/auth/login     — authenticate and receive token pair
   POST /api/auth/refresh   — exchange refresh token for new token pair
   POST /api/auth/logout    — revoke the current refresh token
@@ -23,7 +23,6 @@ from app.core.security import (
     get_current_user,
     hash_password,
     hash_token,
-    require_admin,
     verify_password,
 )
 from app.core.limiter import limiter
@@ -45,26 +44,25 @@ async def register(
     body: UserCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    _admin: User = Depends(require_admin),
 ):
-    """Register a new user.  Requires admin privileges."""
-    # Check for existing username or email
+    """Register a new user account using email-based identity."""
+    # Check for existing username/email collisions
     existing = await db.execute(
         select(User).where(
-            (User.username == body.username) | (User.email == body.email)
+            (User.username == body.email) | (User.email == body.email)
         )
     )
     if existing.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Username or email already exists",
+            detail="Email already exists",
         )
 
     user = User(
-        username=body.username,
+        username=body.email,
         email=body.email,
         hashed_password=hash_password(body.password),
-        role=body.role.value,
+        role="operator",
     )
     db.add(user)
     await db.flush()
@@ -72,11 +70,11 @@ async def register(
 
     await record_audit(
         db,
-        user_id=_admin.id,
+        user_id=None,
         action="register_user",
         entity_type="user",
         entity_id=user.id,
-        details={"username": user.username, "role": user.role},
+        details={"email": user.email, "role": user.role},
         request=request,
     )
 
@@ -90,9 +88,11 @@ async def login(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    """Authenticate with username and password, receive a JWT token pair."""
+    """Authenticate with email (or legacy username) and password, receive a JWT token pair."""
     result = await db.execute(
-        select(User).where(User.username == body.username)
+        select(User).where(
+            (User.email == body.username) | (User.username == body.username)
+        )
     )
     user = result.scalar_one_or_none()
 
@@ -103,12 +103,12 @@ async def login(
             user_id=None,
             action="login_failed",
             entity_type="auth",
-            details={"username": body.username},
+            details={"identifier": body.username},
             request=request,
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password",
+            detail="Invalid email or password",
         )
 
     if not user.is_active:

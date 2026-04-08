@@ -91,6 +91,8 @@ Autonomous runs as two separate processes: the FastAPI backend and the React fro
    *(Note: `--break-system-packages` is required in newer Debian/Kali versions when installing globally, or you can use a virtual environment).*
 3. Seed the database with initial data:
    ```bash
+   export SEED_OWNER_EMAIL="your-email@example.com"
+   export SEED_OWNER_PASSWORD="YourStrongPassword1"
    python3 -m app.seed
    ```
 4. Start the backend server in the background:
@@ -117,9 +119,7 @@ Autonomous runs as two separate processes: the FastAPI backend and the React fro
 Open your Windows web browser (Edge, Chrome, or Firefox) and navigate to:
 **http://localhost:3000**
 
-Log in using the default administrator credentials:
-- **Username:** `admin`
-- **Password:** `Admin123!`
+Sign in using the email address and password created for your account.
 
 ---
 

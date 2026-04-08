@@ -10,8 +10,8 @@ from tests.conftest import auth_headers
 async def test_login_success(client):
     """Valid credentials should return a token pair."""
     resp = await client.post("/api/auth/login", json={
-        "username": "testadmin",
-        "password": "Admin123!",
+        "username": "owner.test@example.com",
+        "password": "OwnerPass9X",
     })
     assert resp.status_code == 200
     data = resp.json()
@@ -24,7 +24,7 @@ async def test_login_success(client):
 async def test_login_invalid_password(client):
     """Wrong password should return 401."""
     resp = await client.post("/api/auth/login", json={
-        "username": "testadmin",
+        "username": "owner.test@example.com",
         "password": "WrongPassword1!",
     })
     assert resp.status_code == 401
@@ -46,7 +46,7 @@ async def test_me_authenticated(client, admin_token):
     resp = await client.get("/api/auth/me", headers=auth_headers(admin_token))
     assert resp.status_code == 200
     data = resp.json()
-    assert data["username"] == "testadmin"
+    assert data["username"] == "owner.test@example.com"
     assert data["role"] == "admin"
 
 
@@ -62,8 +62,8 @@ async def test_token_refresh(client):
     """Refresh token should return a new token pair."""
     # Login first
     login_resp = await client.post("/api/auth/login", json={
-        "username": "testadmin",
-        "password": "Admin123!",
+        "username": "owner.test@example.com",
+        "password": "OwnerPass9X",
     })
     tokens = login_resp.json()
 
@@ -81,8 +81,8 @@ async def test_token_refresh(client):
 async def test_refresh_token_rotation(client):
     """Used refresh token should be revoked (rotation)."""
     login_resp = await client.post("/api/auth/login", json={
-        "username": "testadmin",
-        "password": "Admin123!",
+        "username": "owner.test@example.com",
+        "password": "OwnerPass9X",
     })
     tokens = login_resp.json()
 
@@ -100,46 +100,49 @@ async def test_refresh_token_rotation(client):
 
 
 @pytest.mark.asyncio
-async def test_register_admin_only(client, operator_token):
-    """Operators should not be able to register new users."""
+async def test_register_open_to_users(client):
+    """Registration should be available without prior authentication."""
     resp = await client.post(
         "/api/auth/register",
         json={
-            "username": "newuser",
             "email": "new@example.com",
             "password": "NewUser123!",
-            "role": "operator",
         },
-        headers=auth_headers(operator_token),
-    )
-    assert resp.status_code == 403
-
-
-@pytest.mark.asyncio
-async def test_register_by_admin(client, admin_token):
-    """Admins should be able to register new users."""
-    resp = await client.post(
-        "/api/auth/register",
-        json={
-            "username": "newuser2",
-            "email": "new2@example.com",
-            "password": "NewUser2Abc",
-            "role": "operator",
-        },
-        headers=auth_headers(admin_token),
     )
     assert resp.status_code == 201
     data = resp.json()
-    assert data["username"] == "newuser2"
+    assert data["username"] == "new@example.com"
     assert data["role"] == "operator"
+
+
+@pytest.mark.asyncio
+async def test_register_rejects_duplicate_email(client):
+    """Registration should reject duplicate email addresses."""
+    first = await client.post(
+        "/api/auth/register",
+        json={
+            "email": "dup@example.com",
+            "password": "NewUser2Abc",
+        },
+    )
+    assert first.status_code == 201
+
+    resp = await client.post(
+        "/api/auth/register",
+        json={
+            "email": "dup@example.com",
+            "password": "NewUser2Abc",
+        },
+    )
+    assert resp.status_code == 409
 
 
 @pytest.mark.asyncio
 async def test_logout(client, admin_token):
     """Logout should revoke the refresh token."""
     login_resp = await client.post("/api/auth/login", json={
-        "username": "testadmin",
-        "password": "Admin123!",
+        "username": "owner.test@example.com",
+        "password": "OwnerPass9X",
     })
     tokens = login_resp.json()
 

@@ -43,17 +43,17 @@ async def setup_db():
     async with async_session() as db:
         admin = User(
             id="test-admin-id",
-            username="testadmin",
-            email="admin@test.local",
-            hashed_password=hash_password("Admin123!"),
+            username="owner.test@example.com",
+            email="owner.test@example.com",
+            hashed_password=hash_password("OwnerPass9X"),
             role="admin",
             is_active=True,
         )
         operator = User(
             id="test-operator-id",
-            username="testoperator",
-            email="operator@test.local",
-            hashed_password=hash_password("Operator1!"),
+            username="member.test@example.com",
+            email="member.test@example.com",
+            hashed_password=hash_password("MemberPass9X"),
             role="operator",
             is_active=True,
         )
@@ -78,8 +78,8 @@ async def client(setup_db):
 async def admin_token(client):
     """Get an admin JWT token."""
     resp = await client.post("/api/auth/login", json={
-        "username": "testadmin",
-        "password": "Admin123!",
+        "username": "owner.test@example.com",
+        "password": "OwnerPass9X",
     })
     assert resp.status_code == 200
     return resp.json()["access_token"]
@@ -89,8 +89,8 @@ async def admin_token(client):
 async def operator_token(client):
     """Get an operator JWT token."""
     resp = await client.post("/api/auth/login", json={
-        "username": "testoperator",
-        "password": "Operator1!",
+        "username": "member.test@example.com",
+        "password": "MemberPass9X",
     })
     assert resp.status_code == 200
     return resp.json()["access_token"]
