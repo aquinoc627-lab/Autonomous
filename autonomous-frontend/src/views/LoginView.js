@@ -14,7 +14,7 @@ export default function LoginView() {
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyCenter: 'center', color: 'white', fontFamily: 'monospace' }}>
+    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'monospace' }}>
       <form onSubmit={handleHandshake} style={{ border: '1px solid #1e293b', padding: '40px', borderRadius: '12px', background: '#0f172a', width: '350px', textAlign: 'center' }}>
         <h1 style={{ color: '#10b981' }}>theCORE</h1>
         <p style={{ fontSize: '10px', color: '#64748b', marginBottom: '20px' }}>SECURE ACCESS PROTOCOL</p>

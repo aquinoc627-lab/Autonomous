@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -12,6 +13,7 @@ from app.models.user import User
 from app.models.payment_transaction import PaymentTransaction
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 PACKAGES = {
     "operative_monthly": {"amount": 49.00, "tier": "operative"},
@@ -24,7 +26,12 @@ PACKAGES = {
 
 
 def get_stripe_api_key() -> str:
-    return os.getenv("STRIPE_API_KEY", "sk_test_emergent")
+    """Return the Stripe API key, raising a 503 if not configured."""
+    key = os.getenv("STRIPE_API_KEY")
+    if not key:
+        logger.error("STRIPE_API_KEY environment variable is not set.")
+        raise HTTPException(status_code=503, detail="Billing service is not configured.")
+    return key
 
 
 def get_webhook_secret() -> str:

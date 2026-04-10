@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import requests
 from google import genai
@@ -35,13 +36,18 @@ class AutonomousPipeline:
 
     def run_jules_review(self, target_directory: str) -> str:
         """Executes Jules locally and safely captures all output streams."""
+        # Resolve the jules binary: honour JULES_BIN env var, otherwise find on PATH.
+        jules_bin = os.environ.get("JULES_BIN") or shutil.which("jules")
+        if not jules_bin:
+            console.print("[bold red]Jules binary not found.[/bold red] Set JULES_BIN or ensure 'jules' is on PATH.")
+            return ""
         try:
             # IMPORTANT: shell=False prevents shell injection vulnerabilities.
             result = subprocess.run(
-                ['/home/voldemort/.npm-global/bin/jules', 'review', target_directory], 
-                capture_output=True, 
-                text=True, 
-                check=False # Allow us to manually catch and print errors
+                [jules_bin, 'review', target_directory],
+                capture_output=True,
+                text=True,
+                check=False  # Allow us to manually catch and print errors
             )
             
             # Node CLIs often output to stderr. We capture both to be safe.

@@ -1,12 +1,6 @@
 import { create } from 'zustand';
-interface TelemetryState {
-  linkStatus: string;
-  throughput: number;
-  anomalies: number;
-  activeNodes: number;
-  updateTelemetry: (data: Partial<TelemetryState>) => void;
-}
-export const useTelemetryStore = create<TelemetryState>((set) => ({
+
+export const useTelemetryStore = create((set) => ({
   linkStatus: 'INITIALIZING...',
   throughput: 0.0,
   anomalies: 0,
