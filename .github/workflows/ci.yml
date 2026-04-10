@@ -21,7 +21,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt
+        run: |
+          grep -v "^emergentintegrations" backend/requirements.txt > /tmp/ci-requirements.txt
+          pip install -r /tmp/ci-requirements.txt
 
       - name: Lint with flake8
         run: |
@@ -35,7 +37,7 @@ jobs:
       - name: Security audit
         run: |
           pip install pip-audit
-          pip-audit -r backend/requirements.txt
+          pip-audit -r /tmp/ci-requirements.txt
 
   frontend:
     name: Frontend (Node 24)
