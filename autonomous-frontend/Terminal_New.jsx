@@ -30,7 +30,7 @@ export default function Terminal() {
       const prompt = cleanCmd.replace('ask ', '');
       try {
         const res = await axios.post('http://localhost:8000/api/ai/generate-command', { prompt });
-        setHistory(prev => [...prev, \`AI_SUGGESTION: Use \${res.data.tool}\`, \`COMMAND: \${res.data.command}\`, '--- PRESS ENTER TO EXECUTE ---']);
+        setHistory(prev => [...prev, `AI_SUGGESTION: Use ${res.data.tool}`, `COMMAND: ${res.data.command}`, '--- PRESS ENTER TO EXECUTE ---']);
         setInput(res.data.command);
       } catch (err) {
         setHistory(prev => [...prev, 'AI_ERROR: UNABLE TO MAP INTENT.']);
@@ -58,7 +58,7 @@ export default function Terminal() {
       ))}
       <div style={{ display: 'flex', marginTop: '10px' }}>
         <span style={{ marginRight: '10px', color: '#64748b' }}>operator@autonomous:~$</span>
-        <input autoFocus value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { setHistory(prev => [...prev, \`operator@autonomous:~$ \${input}\`]); runCommand(input); setInput(''); } }} style={{ background: 'none', border: 'none', color: '#10b981', outline: 'none', flex: 1, fontFamily: 'monospace' }} />
+        <input autoFocus value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { setHistory(prev => [...prev, `operator@autonomous:~$ ${input}`]); runCommand(input); setInput(''); } }} style={{ background: 'none', border: 'none', color: '#10b981', outline: 'none', flex: 1, fontFamily: 'monospace' }} />
       </div>
     </div>
   );

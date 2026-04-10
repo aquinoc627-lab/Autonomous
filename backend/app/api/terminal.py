@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 from fastapi import APIRouter
+import logging
 import subprocess
 import shlex
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 class CommandRequest(BaseModel):
@@ -30,4 +32,5 @@ async def execute_command(request: CommandRequest):
             "returncode": process.returncode
         }
     except Exception as e:
-        return {"stdout": "", "stderr": str(e), "returncode": 1}
+        logger.error("Terminal command execution failed: %s", e)
+        return {"stdout": "", "stderr": "Command execution failed.", "returncode": 1}
