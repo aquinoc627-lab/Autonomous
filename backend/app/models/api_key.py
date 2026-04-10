@@ -1,11 +1,12 @@
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKey
 
 if TYPE_CHECKING:
     from app.models.user import User
+
 
 class ApiKey(Base, UUIDPrimaryKey, TimestampMixin):
     __tablename__ = "api_keys"

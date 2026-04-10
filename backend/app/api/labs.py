@@ -143,7 +143,7 @@ async def start_lab(lab_id: str, current_user: User = Depends(get_current_user))
             detach=True,
             ports={f"{config['container_port']}/tcp": None},
         )
-        
+
         # Wait for port mappings to be populated
         for _ in range(3):
             container.reload()

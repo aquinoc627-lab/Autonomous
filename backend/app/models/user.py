@@ -26,7 +26,7 @@ class User(Base, UUIDPrimaryKey, TimestampMixin):
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
     role: Mapped[str] = mapped_column(String(16), nullable=False, default="operator")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    
+
     # Tiering & Subscriptions
     tier: Mapped[str] = mapped_column(String(32), nullable=False, default="free_trial")
     stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)

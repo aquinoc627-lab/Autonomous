@@ -1,0 +1,16 @@
+.git
+node_modules
+*.md
+docs/
+logos/
+.env*
+!.env.example
+__pycache__
+*.pyc
+.vscode
+.idea
+*.log
+data/
+backend/data/
+autonomous-frontend/node_modules/
+autonomous-frontend/build/

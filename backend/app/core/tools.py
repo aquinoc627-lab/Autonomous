@@ -1,11 +1,10 @@
-import requests
 from bs4 import BeautifulSoup
 from typing import List, Dict, Optional
 import logging
-import json
-import re
+import requests
 
 logger = logging.getLogger(__name__)
+
 
 class ToolService:
     """
@@ -20,7 +19,7 @@ class ToolService:
         In a production environment, this would call Google Search API, Bing, or Serper.
         """
         logger.info(f"Performing web search for: {query}")
-        
+
         # Mock search results for demonstration
         # In a real app, you'd use: requests.get(f"https://api.search.com?q={query}")
         mock_results = [
@@ -40,7 +39,7 @@ class ToolService:
                 "snippet": f"Discover the most interesting and surprising facts about {query} that you probably didn't know."
             }
         ]
-        
+
         return mock_results[:limit]
 
     @staticmethod
@@ -58,9 +57,9 @@ class ToolService:
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             })
             response.raise_for_status()
-            
+
             soup = BeautifulSoup(response.text, 'html.parser')
-            
+
             # Remove script and style elements
             for script in soup(["script", "style"]):
                 script.decompose()
@@ -70,10 +69,10 @@ class ToolService:
             lines = (line.strip() for line in text.splitlines())
             chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
             text = '\n'.join(chunk for chunk in chunks if chunk)
-            
+
             # Limit content length for LLM processing
             return text[:5000]
-            
+
         except Exception as e:
             logger.error(f"Error fetching content from {url}: {str(e)}")
             return f"Error: Failed to fetch content. {str(e)}"
@@ -87,6 +86,7 @@ class ToolService:
         if len(text) <= max_length:
             return text
         return text[:max_length] + "..."
+
 
 # Registry of available tools for the Agent Brain
 AVAILABLE_TOOLS = {

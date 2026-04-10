@@ -26,15 +26,11 @@ from pydantic import BaseModel, Field
 
 from app.core.security import get_current_user
 from app.core.tool_registry import (
-    get_all_tools,
-    get_tool_by_id,
-    get_tools_by_category,
-    get_tools_by_os,
-    get_tools_by_severity,
+    TOOL_REGISTRY, get_all_tools,
     get_categories,
-    get_tool_count,
-    search_tools,
-    TOOL_REGISTRY,
+    get_tools_by_os,
+    get_tool_by_id,
+    search_tools
 )
 from app.core.command_engine import generate_command, CommandGenerationError
 from app.core.audit import record_audit
@@ -66,7 +62,7 @@ class CommandConfirmRequest(BaseModel):
     target_os: str = Field(..., pattern=r"^(linux|windows|android)$")
     params: Dict[str, str] = Field(default_factory=dict)
     confirmation_code: str = Field(..., min_length=1, max_length=64,
-                                    description="Must be 'CONFIRM' to proceed")
+                                   description="Must be 'CONFIRM' to proceed")
 
 
 class ToolSummary(BaseModel):

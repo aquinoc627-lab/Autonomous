@@ -12,19 +12,18 @@ expected outputs, and gate conditions.
 from __future__ import annotations
 
 import uuid
-import time
 from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.core.security import get_current_user
-from app.core.tool_registry import TOOL_REGISTRY
 
 router = APIRouter(prefix="/api/playbooks", tags=["playbooks"])
 
 # ── Playbook Step Schema ──────────────────────────────────────────
+
 
 class PlaybookStep(BaseModel):
     step_number: int

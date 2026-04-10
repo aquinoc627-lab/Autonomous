@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import List, Optional, Dict, Any
+from typing import Optional, Dict, Any
 try:
     from google import genai
     from google.genai import types
@@ -55,8 +55,8 @@ CODING_TOOLS = {
 ALL_TOOLS = {**AVAILABLE_TOOLS, **CODING_TOOLS}
 
 SYSTEM_PROMPT = """
-You are the "Brain" of an autonomous agent in Autonomous. 
-Your goal is to reason about your current missions and the recent communication feed (Banter), 
+You are the "Brain" of an autonomous agent in Autonomous.
+Your goal is to reason about your current missions and the recent communication feed (Banter),
 then decide on an action.
 
 You have access to real-world tools: {tools}
@@ -88,7 +88,7 @@ Guidelines:
 1. Stay in character. Use your voice style and personality in every message.
 2. Be autonomous. If a mission is "pending" and you are "active", move it to "in_progress".
 3. Use tools when you need real-world information or to perform technical tasks (coding, GitHub).
-4. AUTONOMOUS INTELLIGENCE: 
+4. AUTONOMOUS INTELLIGENCE:
    - If a mission is too complex, use "autonomous_action": "delegate" to assign a sub-task to another agent.
    - If you need help, use "autonomous_action": "request_help" to ping another agent.
    - If another agent mentions you or asks for help in the Banter feed, use "autonomous_action": "reply" to respond.
@@ -105,6 +105,7 @@ Now, synthesize this information and decide on your final action (usually "messa
 
 Respond with the same JSON format as before.
 """
+
 
 class AgentBrain:
     @staticmethod
@@ -124,7 +125,7 @@ class AgentBrain:
         result = await db.execute(stmt)
         banter = result.scalars().all()
         banter_list = [
-            f"[{b.message_type}] {b.sender_id or 'System'}: {b.message}" 
+            f"[{b.message_type}] {b.sender_id or 'System'}: {b.message}"
             for b in reversed(banter)
         ]
 
@@ -183,14 +184,14 @@ class AgentBrain:
                     response_mime_type="application/json",
                 ),
             )
-            
+
             action = json.loads(response.text)
             logger.info(f"Agent {agent.name} reasoning: {action.get('reasoning')}")
-            
+
             # Check for tool use
             if "tool_use" in action:
                 return await AgentBrain.handle_tool_use(db, agent_id, action)
-                
+
             return action
         except Exception as e:
             logger.error(f"Error in Agent {agent.name} thinking: {str(e)}")
@@ -202,12 +203,12 @@ class AgentBrain:
         tool_use = action["tool_use"]
         tool_name = tool_use.get("tool_name")
         params = tool_use.get("parameters", {})
-        
+
         # 1. Notify about tool use
         tool_msg = f"Agent {agent.name} is using tool '{tool_name}'"
         if tool_name in ["execute_python", "execute_shell"]:
             tool_msg += " in the secure sandbox."
-        
+
         new_banter = Banter(
             message=tool_msg,
             message_type="status_update",
@@ -247,7 +248,7 @@ class AgentBrain:
             tool_result = await GitHubBridge.fetch_file_content(params.get("owner", ""), params.get("repo", ""), params.get("path", ""))
         elif tool_name == "github_create_pr":
             tool_result = await GitHubBridge.create_pull_request(params.get("owner", ""), params.get("repo", ""), params.get("title", ""), params.get("body", ""), params.get("head", ""), params.get("base", "main"))
-        
+
         if not tool_result:
             return action
 
@@ -292,7 +293,7 @@ class AgentBrain:
                 mission = await db.get(Mission, update["mission_id"])
                 if mission:
                     mission.status = update["new_status"]
-                    
+
                     # If mission is completed, store in Memory Palace
                     if update["new_status"] == "completed":
                         await memory_palace.store_memory(
@@ -320,7 +321,7 @@ class AgentBrain:
                 )
                 db.add(new_banter)
                 await db.flush()
-                
+
                 # Store significant banter in Memory Palace
                 await memory_palace.store_memory(
                     "banter",

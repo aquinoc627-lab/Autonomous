@@ -23,7 +23,7 @@ from __future__ import annotations
 import re
 import time
 import logging
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 from app.core.tool_registry import get_tool_by_id
 
@@ -125,23 +125,23 @@ def _render_template(template: str, params: Dict[str, str]) -> str:
         i = 0
         while i < len(text):
             # Look for opening '{{'
-            if text[i:i+2] == '{{' and i + 2 < len(text):
+            if text[i:i + 2] == '{{' and i + 2 < len(text):
                 # Find the param name (alphanumeric + underscore)
                 j = i + 2
                 while j < len(text) and (text[j].isalnum() or text[j] == '_'):
                     j += 1
-                param_name = text[i+2:j]
+                param_name = text[i + 2:j]
                 # Check if this is a conditional: {{name:+...}}
-                if param_name and j < len(text) and text[j:j+2] == ':+':
+                if param_name and j < len(text) and text[j:j + 2] == ':+':
                     # Find the matching closing '}}' accounting for nesting
                     inner_start = j + 2
                     depth = 1
                     k = inner_start
                     while k < len(text) and depth > 0:
-                        if text[k:k+2] == '{{': 
+                        if text[k:k + 2] == '{{':
                             depth += 1
                             k += 2
-                        elif text[k:k+2] == '}}':
+                        elif text[k:k + 2] == '}}':
                             depth -= 1
                             if depth == 0:
                                 break

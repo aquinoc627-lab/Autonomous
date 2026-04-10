@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 GITHUB_API_URL = "https://api.github.com"
 
+
 class GitHubBridge:
     """
     A bridge for interacting with GitHub repositories.
@@ -88,7 +89,7 @@ class GitHubBridge:
         base_ref = await cls._request("GET", endpoint)
         if "object" not in base_ref:
             return {"error": "Could not find base branch SHA"}
-        
+
         sha = base_ref["object"]["sha"]
 
         # 2. Create the new branch
@@ -105,7 +106,7 @@ class GitHubBridge:
         Commit a file to a specific branch.
         """
         import base64
-        
+
         # 1. Get the current file SHA (if it exists)
         endpoint = f"repos/{owner}/{repo}/contents/{path}?ref={branch}"
         current_file = await cls._request("GET", endpoint)
@@ -120,5 +121,5 @@ class GitHubBridge:
         }
         if sha:
             data["sha"] = sha
-            
+
         return await cls._request("PUT", endpoint, data)

@@ -15,7 +15,6 @@ Creates:
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -65,7 +64,7 @@ async def seed() -> None:
             role="operator",
             is_active=True,
             tier="free_trial",
-            trial_end_date=_now(14 * 24), # 14 days
+            trial_end_date=_now(14 * 24),  # 14 days
         )
         session.add_all([admin, operator])
         await session.flush()

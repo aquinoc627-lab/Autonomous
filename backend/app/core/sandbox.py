@@ -9,10 +9,8 @@ import asyncio
 import logging
 import os
 import shlex
-import subprocess
 import tempfile
-from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +20,10 @@ logger = logging.getLogger(__name__)
 SANDBOX_TIMEOUT = 10  # seconds
 MAX_OUTPUT_SIZE = 1024 * 100  # 100 KB
 FORBIDDEN_KEYWORDS = [
-    "rm -rf", "mkfs", "dd if=", "shutdown", "reboot", 
+    "rm -rf", "mkfs", "dd if=", "shutdown", "reboot",
     "os.system", "subprocess.call", "eval(", "exec("
 ]
+
 
 class SandboxResult:
     def __init__(self, stdout: str, stderr: str, exit_code: int, duration: float):
@@ -41,6 +40,7 @@ class SandboxResult:
             "duration": self.duration,
             "success": self.exit_code == 0
         }
+
 
 class CodeSandbox:
     """

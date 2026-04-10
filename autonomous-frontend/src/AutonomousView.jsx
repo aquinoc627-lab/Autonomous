@@ -1,8 +1,8 @@
+import "./GenerativeDashboard.css";
 import QuantumWarfare from "./QuantumWarfare";
 import { MdAutoFixHigh } from "react-icons/md";
 import PortalNetwork from "./PortalNetwork";
 import { MdOutlinePublic } from "react-icons/md";
-import GenerativeDashboard from "./GenerativeDashboard";
 import { MdOutlineArchitecture } from "react-icons/md";
 import React, { useCallback, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +26,8 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+
+function GenerativeDashboard() { return <div className="generative-dashboard"><div className="gen-idle-state"><div className="idle-ring" /><p>Adaptive Ops Dashboard</p></div></div>; }
 
 export default function AutonomousView() {
   const { user } = useAuth();

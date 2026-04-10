@@ -102,20 +102,20 @@ async def lifespan(app: FastAPI):
         # Still call init_db to ensure any in-memory/test tables are present.
         await init_db()
         logger.info("Database tables verified.")
-    
+
     # Start the Agent Brain background loop
     brain_task = asyncio.create_task(agent_brain_loop())
     logger.info("Agent Brain background loop started.")
-    
+
     yield
-    
+
     # Cancel the background task on shutdown
     brain_task.cancel()
     try:
         await brain_task
     except asyncio.CancelledError:
         logger.info("Agent Brain background loop cancelled.")
-    
+
     logger.info("Shutting down Autonomous API.")
 
 
@@ -217,10 +217,13 @@ async def health_check():
 # ---------------------------------------------------------------------------
 # Autonomous Mode Control
 # ---------------------------------------------------------------------------
+
+
 @app.get("/api/autonomous", tags=["Autonomous"])
 async def get_autonomous_status(current_user: User = Depends(get_current_user)):
     """Get the current status of autonomous mode."""
     return {"enabled": get_autonomous_mode()}
+
 
 @app.post("/api/autonomous", tags=["Autonomous"])
 async def toggle_autonomous_mode(enabled: bool, current_user: User = Depends(get_current_user)):

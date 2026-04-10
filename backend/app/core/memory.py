@@ -9,10 +9,8 @@ import logging
 import os
 import uuid
 import chromadb
-from chromadb.config import Settings
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from google import genai
-from google.genai import types
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +22,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Initialize Gemini client for embeddings
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+
 
 class MemoryPalace:
     """
@@ -43,7 +42,7 @@ class MemoryPalace:
         """
         os.makedirs(CHROMA_DB_PATH, exist_ok=True)
         self.chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-        
+
         # Create or get collections
         self.missions_collection = self.chroma_client.get_or_create_collection(name="missions")
         self.banter_collection = self.chroma_client.get_or_create_collection(name="banter")
@@ -115,8 +114,9 @@ class MemoryPalace:
                     "metadata": results["metadatas"][0][i],
                     "distance": results["distances"][0][i]
                 })
-        
+
         return memories
+
 
 # Singleton instance
 memory_palace = MemoryPalace()

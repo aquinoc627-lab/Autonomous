@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import os
+import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
-from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -22,11 +22,14 @@ PACKAGES = {
     "nexus_prime_annual": {"amount": 4990.00, "tier": "nexus_prime"},
 }
 
-def get_stripe_checkout(request: Request) -> StripeCheckout:
-    api_key = os.getenv("STRIPE_API_KEY", "sk_test_emergent")
-    host_url = str(request.base_url).rstrip("/")
-    webhook_url = f"{host_url}/api/webhook/stripe"
-    return StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+
+def get_stripe_api_key() -> str:
+    return os.getenv("STRIPE_API_KEY", "sk_test_emergent")
+
+
+def get_webhook_secret() -> str:
+    return os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
 
 @router.post("/create-checkout-session")
 async def create_checkout_session(
@@ -37,49 +40,59 @@ async def create_checkout_session(
 ):
     package_id = body.get("package_id")
     origin_url = body.get("origin_url")
-    
+
     if package_id not in PACKAGES:
         raise HTTPException(status_code=400, detail="Invalid package ID")
     if not origin_url:
         raise HTTPException(status_code=400, detail="Origin URL is required")
-        
+
     amount = PACKAGES[package_id]["amount"]
     target_tier = PACKAGES[package_id]["tier"]
-    
+
     success_url = f"{origin_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{origin_url}/billing"
-    
-    stripe_checkout = get_stripe_checkout(request)
-    
-    checkout_req = CheckoutSessionRequest(
-        amount=amount,
-        currency="usd",
+
+    stripe.api_key = get_stripe_api_key()
+
+    metadata = {
+        "user_id": str(current_user.id),
+        "package_id": package_id,
+        "target_tier": target_tier,
+    }
+
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        line_items=[{
+            "price_data": {
+                "currency": "usd",
+                "unit_amount": int(amount * 100),  # Stripe expects cents
+                "product_data": {
+                    "name": f"Autonomous - {target_tier.replace('_', ' ').title()}",
+                },
+            },
+            "quantity": 1,
+        }],
+        mode="payment",
         success_url=success_url,
         cancel_url=cancel_url,
-        metadata={
-            "user_id": str(current_user.id),
-            "package_id": package_id,
-            "target_tier": target_tier
-        },
-        payment_methods=["card"]
+        metadata=metadata,
     )
-    
-    session = await stripe_checkout.create_checkout_session(checkout_req)
-    
+
     # Create pending transaction
     tx = PaymentTransaction(
         amount=amount,
         currency="usd",
-        session_id=session.session_id,
+        session_id=session.id,
         user_id=str(current_user.id),
         payment_status="pending",
         status="open",
-        metadata_data=checkout_req.metadata
+        metadata_data=metadata,
     )
     db.add(tx)
     await db.commit()
-    
-    return {"url": session.url, "session_id": session.session_id}
+
+    return {"url": session.url, "session_id": session.id}
+
 
 @router.get("/checkout-status/{session_id}")
 async def get_checkout_status(
@@ -88,53 +101,61 @@ async def get_checkout_status(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    stripe_checkout = get_stripe_checkout(request)
+    stripe.api_key = get_stripe_api_key()
     try:
-        status_res = await stripe_checkout.get_checkout_status(session_id)
+        session = stripe.checkout.Session.retrieve(session_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-        
+
     # Get transaction
     result = await db.execute(select(PaymentTransaction).where(PaymentTransaction.session_id == session_id))
     tx = result.scalar_one_or_none()
     if not tx:
         raise HTTPException(status_code=404, detail="Transaction not found")
-        
+
+    payment_status = session.payment_status
+    status = session.status
+
     # Only update if not already processed
-    if tx.payment_status != status_res.payment_status or tx.status != status_res.status:
-        tx.payment_status = status_res.payment_status
-        tx.status = status_res.status
-        
+    if tx.payment_status != payment_status or tx.status != status:
+        tx.payment_status = payment_status
+        tx.status = status
+
         if tx.payment_status == "paid":
             # Upgrade user tier
             target_tier = tx.metadata_data.get("target_tier")
             if target_tier:
                 current_user.tier = target_tier
                 db.add(current_user)
-                
+
         await db.commit()
-        
+
     return {"payment_status": tx.payment_status, "status": tx.status}
+
 
 @router.post("/webhook/stripe")
 async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
-    stripe_checkout = get_stripe_checkout(request)
     body = await request.body()
     signature = request.headers.get("Stripe-Signature")
-    
+
     if not signature:
         return Response(status_code=400)
-        
+
+    webhook_secret = get_webhook_secret()
     try:
-        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        event = stripe.Webhook.construct_event(body, signature, webhook_secret)
     except Exception as e:
         return Response(content=str(e), status_code=400)
-        
-    if webhook_response.session_id:
-        result = await db.execute(select(PaymentTransaction).where(PaymentTransaction.session_id == webhook_response.session_id))
+
+    if event.type == "checkout.session.completed":
+        session = event.data.object
+        session_id = session.id
+        payment_status = session.payment_status
+
+        result = await db.execute(select(PaymentTransaction).where(PaymentTransaction.session_id == session_id))
         tx = result.scalar_one_or_none()
-        if tx and tx.payment_status != webhook_response.payment_status:
-            tx.payment_status = webhook_response.payment_status
+        if tx and tx.payment_status != payment_status:
+            tx.payment_status = payment_status
             if tx.payment_status == "paid":
                 # Upgrade user
                 user_res = await db.execute(select(User).where(User.id == tx.user_id))
@@ -143,5 +164,5 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
                     user.tier = tx.metadata_data.get("target_tier")
                     db.add(user)
             await db.commit()
-            
+
     return {"status": "success"}
