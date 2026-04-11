@@ -37,10 +37,8 @@ jobs:
       - name: Security audit
         run: |
           pip install pip-audit
-copilot/remove-duplicate-imports-and-files
-          pip-audit -r /tmp/ci-requirements.tx
+          pip-audit -r /tmp/ci-requirements.txt
           pip-audit -r backend/requirements.txt || true
- main
 
   frontend:
     name: Frontend (Node 24)
