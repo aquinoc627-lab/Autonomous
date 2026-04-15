@@ -36,12 +36,10 @@ jobs:
 
       - name: Security audit
         run: |
-          pip install pip-audit
-copilot/fix-ci-workflow-merge-conflicts
+          pip install pip-audit copilot/fix-ci-workflow-merge-conflicts
           pip-audit -r /tmp/ci-requirements.txt || true
           pip-audit -r /tmp/ci-requirements.txt
-          pip-audit -r backend/requirements.txt || true
- main
+          pip-audit -r backend/requirements.txt || true main
 
   frontend:
     name: Frontend (Node 24)
