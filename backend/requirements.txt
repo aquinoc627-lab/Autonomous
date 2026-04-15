@@ -90,12 +90,12 @@ Pygments==2.19.2
 PyJWT==2.12.1
 pymongo==4.6.3
 pyparsing==3.3.2
-pytest==9.0.2
+pytest==9.0.3
 pytest-asyncio==1.3.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
 python-jose==3.5.0
-python-multipart==0.0.22
+python-multipart==0.0.26
 pytokens==0.4.1
 PyYAML==6.0.3
 referencing==0.37.0
